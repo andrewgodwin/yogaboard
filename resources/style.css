@@ -6,7 +6,7 @@
     border-radius: 0;
 }
 
-button.keyboard-key {
+.keyboard-key {
     background: #2d3748;
     background-color: #2d3748;
     background-image: none;
@@ -20,19 +20,19 @@ button.keyboard-key {
     box-shadow: none;
 }
 
-button.keyboard-key:hover {
+.keyboard-key:hover {
     background: #3d4758;
     background-color: #3d4758;
     background-image: none;
 }
 
-button.keyboard-key:active {
+.keyboard-key:active {
     background: #4d5768;
     background-color: #4d5768;
     background-image: none;
 }
 
-button.modifier-key {
+.modifier-key {
     background: #3a4555;
     background-color: #3a4555;
     background-image: none;

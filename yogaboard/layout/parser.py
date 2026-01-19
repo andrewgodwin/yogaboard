@@ -16,14 +16,8 @@ class Key:
     is_modifier: bool = False
     modifier: Optional[str] = None
 
-    def get_uinput_key(self):
-        """Convert key name string to uinput constant (key code only)."""
-        key_tuple = getattr(uinput, self.key)
-        # uinput keys are tuples like (EV_KEY, KEY_CODE)
-        # We only need the key code (second element)
-        if isinstance(key_tuple, tuple):
-            return key_tuple[1]
-        return key_tuple
+    def get_uinput_key(self) -> tuple[int, int]:
+        return getattr(uinput, self.key)
 
 
 @dataclass

@@ -31,7 +31,7 @@ install: $(BUNDLE)
 	flatpak install --user -y $(BUNDLE)
 
 clean:
-	rm -rf $(BUILD_DIR) $(REPO_DIR) $(BUNDLE) yogaboard.egg-info .flatpak-builder
+	rm -rf $(BUILD_DIR) $(REPO_DIR) $(BUNDLE) yogaboard.egg-info
 
 $(BUNDLE):
 	@echo "Error: $(BUNDLE) not found. Run 'make build' first."

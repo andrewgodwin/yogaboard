@@ -1,7 +1,8 @@
 """Keyboard grid widget that renders the layout."""
 
 import gi
-gi.require_version('Gtk', '4.0')
+
+gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 from .key_button import KeyButton
 
@@ -20,10 +21,14 @@ class KeyboardWidget(Gtk.Box):
         self.layout = layout
         self.key_buttons = []
 
+        # Add horizontal padding
+        self.set_margin_start(20)
+        self.set_margin_end(20)
+
         # Build keyboard grid row by row
         for row in layout.rows:
             row_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-            row_box.set_halign(Gtk.Align.CENTER)
+            row_box.set_hexpand(True)
 
             for key in row.keys:
                 btn = KeyButton(key)
@@ -32,7 +37,7 @@ class KeyboardWidget(Gtk.Box):
 
             self.append(row_box)
 
-        self.add_css_class('keyboard-widget')
+        self.add_css_class("keyboard-widget")
 
     def get_key_at_position(self, x, y):
         """
@@ -55,8 +60,7 @@ class KeyboardWidget(Gtk.Box):
             width = btn.get_width()
             height = btn.get_height()
 
-            if (btn_x <= x < btn_x + width and
-                btn_y <= y < btn_y + height):
+            if btn_x <= x < btn_x + width and btn_y <= y < btn_y + height:
                 return btn.key
 
         return None

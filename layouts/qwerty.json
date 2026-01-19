@@ -75,67 +75,80 @@
         {
           "label": "`",
           "key": "KEY_GRAVE",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "~"
         },
         {
           "label": "1",
           "key": "KEY_1",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "!"
         },
         {
           "label": "2",
           "key": "KEY_2",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "@"
         },
         {
           "label": "3",
           "key": "KEY_3",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "#"
         },
         {
           "label": "4",
           "key": "KEY_4",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "$"
         },
         {
           "label": "5",
           "key": "KEY_5",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "%"
         },
         {
           "label": "6",
           "key": "KEY_6",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "^"
         },
         {
           "label": "7",
           "key": "KEY_7",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "&"
         },
         {
           "label": "8",
           "key": "KEY_8",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "*"
         },
         {
           "label": "9",
           "key": "KEY_9",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "("
         },
         {
           "label": "0",
           "key": "KEY_0",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": ")"
         },
         {
           "label": "-",
           "key": "KEY_MINUS",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "_"
         },
         {
           "label": "=",
           "key": "KEY_EQUAL",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "+"
         },
         {
           "label": "⌫",
@@ -204,17 +217,20 @@
         {
           "label": "[",
           "key": "KEY_LEFTBRACE",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "{"
         },
         {
           "label": "]",
           "key": "KEY_RIGHTBRACE",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "}"
         },
         {
           "label": "\\",
           "key": "KEY_BACKSLASH",
-          "width": 1.5
+          "width": 1.5,
+          "secondary_label": "|"
         }
       ]
     },
@@ -273,12 +289,14 @@
         {
           "label": ";",
           "key": "KEY_SEMICOLON",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": ":"
         },
         {
           "label": "'",
           "key": "KEY_APOSTROPHE",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "\""
         },
         {
           "label": "Enter",
@@ -333,17 +351,20 @@
         {
           "label": ",",
           "key": "KEY_COMMA",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "<"
         },
         {
           "label": ".",
           "key": "KEY_DOT",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": ">"
         },
         {
           "label": "/",
           "key": "KEY_SLASH",
-          "width": 1.0
+          "width": 1.0,
+          "secondary_label": "?"
         },
         {
           "label": "Shift",
@@ -358,48 +379,48 @@
         {
           "label": "Ctrl",
           "key": "KEY_LEFTCTRL",
-          "width": 1.25,
+          "width": 1,
           "is_modifier": true
         },
         {
           "label": "Super",
           "key": "KEY_LEFTMETA",
-          "width": 1.25,
+          "width": 1,
           "is_modifier": true
         },
         {
           "label": "Alt",
           "key": "KEY_LEFTALT",
-          "width": 1.25,
+          "width": 1,
           "is_modifier": true
         },
         {
           "label": "Space",
           "key": "KEY_SPACE",
-          "width": 6.25
+          "width": 12
         },
         {
           "label": "Alt",
           "key": "KEY_RIGHTALT",
-          "width": 1.25,
+          "width": 1,
           "is_modifier": true
         },
         {
           "label": "Super",
           "key": "KEY_RIGHTMETA",
-          "width": 1.25,
+          "width": 1,
           "is_modifier": true
         },
         {
           "label": "Menu",
           "key": "KEY_COMPOSE",
-          "width": 1.25,
+          "width": 1,
           "is_modifier": true
         },
         {
           "label": "Ctrl",
           "key": "KEY_RIGHTCTRL",
-          "width": 1.25,
+          "width": 1,
           "is_modifier": true
         }
       ]

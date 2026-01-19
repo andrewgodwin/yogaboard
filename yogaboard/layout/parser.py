@@ -15,6 +15,7 @@ class Key:
     width: float = 1.0
     is_modifier: bool = False
     modifier: Optional[str] = None
+    secondary_label: Optional[str] = None
 
     def get_uinput_key(self) -> tuple[int, int]:
         return getattr(uinput, self.key)

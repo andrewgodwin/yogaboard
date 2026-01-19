@@ -3,11 +3,12 @@
 from ctypes import CDLL
 
 # Must load layer-shell before importing GTK
-CDLL('libgtk4-layer-shell.so.0')
+CDLL("libgtk4-layer-shell.so.0")
 
 import gi
-gi.require_version('Gtk', '4.0')
-gi.require_version('Gtk4LayerShell', '1.0')
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Gtk4LayerShell", "1.0")
 from gi.repository import Gtk, Gtk4LayerShell as LayerShell
 
 
@@ -34,4 +35,4 @@ class KeyboardWindow(Gtk.ApplicationWindow):
         LayerShell.set_keyboard_mode(self, LayerShell.KeyboardMode.NONE)
 
         # Set window size: full width, 300px height
-        self.set_default_size(-1, 300)
+        self.set_default_size(-1, 400)

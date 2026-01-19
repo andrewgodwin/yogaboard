@@ -34,5 +34,5 @@ class KeyboardWindow(Gtk.ApplicationWindow):
         # so that touching keys doesn't steal focus from the target application
         LayerShell.set_keyboard_mode(self, LayerShell.KeyboardMode.NONE)
 
-        # Set window size: full width, 300px height
+        # Set window size
         self.set_default_size(-1, 400)

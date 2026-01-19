@@ -1,0 +1,56 @@
+{
+  "name": "Slim",
+  "window_height": 40,
+  "rows": [
+    {
+      "keys": [
+        {
+          "label": "🔅",
+          "key": "KEY_BRIGHTNESSDOWN",
+          "width": 1.0
+        },
+        {
+          "label": "🔆",
+          "key": "KEY_BRIGHTNESSUP",
+          "width": 1.0
+        },
+        {
+          "label": "🔇",
+          "key": "KEY_MUTE",
+          "width": 1.0
+        },
+        {
+          "label": "🔉",
+          "key": "KEY_VOLUMEDOWN",
+          "width": 1.0
+        },
+        {
+          "label": "🔊",
+          "key": "KEY_VOLUMEUP",
+          "width": 1.0
+        },
+        {
+          "label": "⏮",
+          "key": "KEY_PREVIOUSSONG",
+          "width": 1.0
+        },
+        {
+          "label": "⏯",
+          "key": "KEY_PLAYPAUSE",
+          "width": 1.0
+        },
+        {
+          "label": "⏭",
+          "key": "KEY_NEXTSONG",
+          "width": 1.0
+        },
+        {
+          "label": "⇅",
+          "key": "KEY_UNKNOWN",
+          "width": 1.0,
+          "is_mode_toggle": true
+        }
+      ]
+    }
+  ]
+}

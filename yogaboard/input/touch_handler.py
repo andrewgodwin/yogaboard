@@ -17,8 +17,9 @@ class TouchHandler:
     to our virtual keyboard.
     """
 
-    def __init__(self, uinput_keyboard: UInputKeyboard):
+    def __init__(self, uinput_keyboard: UInputKeyboard, app=None):
         self.keyboard = uinput_keyboard
+        self.app = app  # Reference to KeyboardApp for mode toggling
 
     def setup_gestures(self, keyboard_widget):
         """
@@ -37,6 +38,12 @@ class TouchHandler:
             btn.add_controller(gesture)
 
     def _on_button_press(self, gesture, n_press, x, y, button: KeyButton):
+        # Check if this is the mode toggle button
+        if hasattr(button.key, 'is_mode_toggle') and button.key.is_mode_toggle:
+            if self.app:
+                self.app.toggle_mode()
+            return
+
         # Send the key press
         key_code = button.key.get_uinput_key()
         self.keyboard.send_key(key_code, pressed=True)

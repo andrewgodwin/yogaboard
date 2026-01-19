@@ -16,6 +16,7 @@ class Key:
     is_modifier: bool = False
     modifier: Optional[str] = None
     secondary_label: Optional[str] = None
+    is_mode_toggle: bool = False
 
     def get_uinput_key(self) -> tuple[int, int]:
         return getattr(uinput, self.key)
@@ -34,6 +35,7 @@ class Layout:
 
     name: str
     rows: List[Row]
+    window_height: Optional[int] = None
 
 
 class LayoutParser:
@@ -58,4 +60,8 @@ class LayoutParser:
             keys = [Key(**key_data) for key_data in row_data["keys"]]
             rows.append(Row(keys=keys))
 
-        return Layout(name=data["name"], rows=rows)
+        return Layout(
+            name=data["name"],
+            rows=rows,
+            window_height=data.get("window_height")
+        )

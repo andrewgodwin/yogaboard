@@ -22,8 +22,8 @@ class KeyboardWidget(Gtk.Box):
         self.key_buttons = []
 
         # Add horizontal padding
-        self.set_margin_start(20)
-        self.set_margin_end(20)
+        self.set_margin_start(80)
+        self.set_margin_end(80)
 
         # Build keyboard grid row by row
         for row in layout.rows:

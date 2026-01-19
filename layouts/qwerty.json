@@ -1,5 +1,6 @@
 {
   "name": "QWERTY",
+  "window_height": 500,
   "rows": [
     {
       "keys": [
@@ -397,7 +398,7 @@
         {
           "label": "Space",
           "key": "KEY_SPACE",
-          "width": 12
+          "width": 11
         },
         {
           "label": "Alt",
@@ -422,6 +423,12 @@
           "key": "KEY_RIGHTCTRL",
           "width": 1,
           "is_modifier": true
+        },
+        {
+          "label": "⇅",
+          "key": "KEY_UNKNOWN",
+          "width": 1.0,
+          "is_mode_toggle": true
         }
       ]
     }

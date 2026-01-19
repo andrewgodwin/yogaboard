@@ -139,6 +139,73 @@ class UInputKeyboard:
         uinput.KEY_102ND,  # The extra key on European keyboards (between left shift and Z)
         # Context menu key (between right Windows and right Ctrl)
         uinput.KEY_COMPOSE,
+        # Media control keys
+        uinput.KEY_MUTE,
+        uinput.KEY_VOLUMEDOWN,
+        uinput.KEY_VOLUMEUP,
+        uinput.KEY_PLAYPAUSE,
+        uinput.KEY_STOPCD,
+        uinput.KEY_PREVIOUSSONG,
+        uinput.KEY_NEXTSONG,
+        uinput.KEY_MEDIA,  # Media player key
+        # Display/brightness controls
+        uinput.KEY_BRIGHTNESSDOWN,
+        uinput.KEY_BRIGHTNESSUP,
+        uinput.KEY_DISPLAY_OFF,
+        uinput.KEY_SWITCHVIDEOMODE,  # Display toggle (external monitor)
+        # Power management
+        uinput.KEY_SLEEP,
+        uinput.KEY_WAKEUP,
+        uinput.KEY_POWER,
+        uinput.KEY_SUSPEND,
+        # Laptop function keys
+        uinput.KEY_BATTERY,
+        uinput.KEY_WLAN,  # WiFi toggle
+        uinput.KEY_BLUETOOTH,
+        uinput.KEY_TOUCHPAD_TOGGLE,
+        uinput.KEY_TOUCHPAD_ON,
+        uinput.KEY_TOUCHPAD_OFF,
+        uinput.KEY_CAMERA,  # Camera toggle
+        uinput.KEY_MICMUTE,  # Microphone mute
+        # Application shortcuts
+        uinput.KEY_MAIL,
+        uinput.KEY_HOMEPAGE,
+        uinput.KEY_SEARCH,
+        uinput.KEY_BOOKMARKS,
+        uinput.KEY_BACK,  # Browser back
+        uinput.KEY_FORWARD,  # Browser forward
+        uinput.KEY_STOP,  # Browser stop
+        uinput.KEY_REFRESH,  # Browser refresh
+        uinput.KEY_CALC,  # Calculator
+        uinput.KEY_FILE,  # File manager
+        uinput.KEY_COMPUTER,
+        # Screen capture
+        uinput.KEY_PRINT,  # Print screen / screenshot
+        # Additional F-keys (F13-F24 for extended keyboards)
+        uinput.KEY_F13,
+        uinput.KEY_F14,
+        uinput.KEY_F15,
+        uinput.KEY_F16,
+        uinput.KEY_F17,
+        uinput.KEY_F18,
+        uinput.KEY_F19,
+        uinput.KEY_F20,
+        uinput.KEY_F21,
+        uinput.KEY_F22,
+        uinput.KEY_F23,
+        uinput.KEY_F24,
+        # Zoom controls (useful for presentations)
+        uinput.KEY_ZOOM,
+        uinput.KEY_ZOOMIN,
+        uinput.KEY_ZOOMOUT,
+        uinput.KEY_ZOOMRESET,
+        # Additional useful keys
+        uinput.KEY_SCREENSAVER,
+        uinput.KEY_COFFEE,  # Screen lock
+        uinput.KEY_PROG1,  # Programmable key 1
+        uinput.KEY_PROG2,  # Programmable key 2
+        uinput.KEY_PROG3,  # Programmable key 3
+        uinput.KEY_PROG4,  # Programmable key 4
     ]
 
     def __init__(self):

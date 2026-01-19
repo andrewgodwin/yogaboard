@@ -17,6 +17,7 @@ class KeyboardWindow(Gtk.ApplicationWindow):
 
     def __init__(self, app):
         super().__init__(application=app)
+        self.app = app
 
         # Initialize layer-shell for Wayland overlay
         LayerShell.init_for_window(self)
@@ -36,3 +37,25 @@ class KeyboardWindow(Gtk.ApplicationWindow):
 
         # Set window size
         self.set_default_size(-1, 400)
+
+        # Create overlay container for close button
+        self.overlay = Gtk.Overlay()
+        super().set_child(self.overlay)
+
+        # Create close button with diagonal X symbol
+        self.close_button = Gtk.Button(label="✕")
+        self.close_button.set_halign(Gtk.Align.END)
+        self.close_button.set_valign(Gtk.Align.START)
+        self.close_button.set_margin_top(10)
+        self.close_button.set_margin_end(10)
+        self.close_button.add_css_class("close-button")
+        self.close_button.connect("clicked", self._on_close_clicked)
+        self.overlay.add_overlay(self.close_button)
+
+    def _on_close_clicked(self, button):
+        """Handle close button click."""
+        self.app.quit()
+
+    def set_child(self, child):
+        """Override set_child to place content in overlay."""
+        self.overlay.set_child(child)

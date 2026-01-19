@@ -1,0 +1,53 @@
+{
+  "name": "QWERTY",
+  "rows": [
+    {
+      "keys": [
+        {"label": "Q", "key": "KEY_Q", "width": 1.0},
+        {"label": "W", "key": "KEY_W", "width": 1.0},
+        {"label": "E", "key": "KEY_E", "width": 1.0},
+        {"label": "R", "key": "KEY_R", "width": 1.0},
+        {"label": "T", "key": "KEY_T", "width": 1.0},
+        {"label": "Y", "key": "KEY_Y", "width": 1.0},
+        {"label": "U", "key": "KEY_U", "width": 1.0},
+        {"label": "I", "key": "KEY_I", "width": 1.0},
+        {"label": "O", "key": "KEY_O", "width": 1.0},
+        {"label": "P", "key": "KEY_P", "width": 1.0}
+      ]
+    },
+    {
+      "keys": [
+        {"label": "A", "key": "KEY_A", "width": 1.0},
+        {"label": "S", "key": "KEY_S", "width": 1.0},
+        {"label": "D", "key": "KEY_D", "width": 1.0},
+        {"label": "F", "key": "KEY_F", "width": 1.0},
+        {"label": "G", "key": "KEY_G", "width": 1.0},
+        {"label": "H", "key": "KEY_H", "width": 1.0},
+        {"label": "J", "key": "KEY_J", "width": 1.0},
+        {"label": "K", "key": "KEY_K", "width": 1.0},
+        {"label": "L", "key": "KEY_L", "width": 1.0}
+      ]
+    },
+    {
+      "keys": [
+        {"label": "Shift", "key": "KEY_LEFTSHIFT", "width": 1.5, "is_modifier": true, "modifier": "shift"},
+        {"label": "Z", "key": "KEY_Z", "width": 1.0},
+        {"label": "X", "key": "KEY_X", "width": 1.0},
+        {"label": "C", "key": "KEY_C", "width": 1.0},
+        {"label": "V", "key": "KEY_V", "width": 1.0},
+        {"label": "B", "key": "KEY_B", "width": 1.0},
+        {"label": "N", "key": "KEY_N", "width": 1.0},
+        {"label": "M", "key": "KEY_M", "width": 1.0},
+        {"label": "⌫", "key": "KEY_BACKSPACE", "width": 1.5}
+      ]
+    },
+    {
+      "keys": [
+        {"label": "Ctrl", "key": "KEY_LEFTCTRL", "width": 1.5, "is_modifier": true, "modifier": "ctrl"},
+        {"label": "Alt", "key": "KEY_LEFTALT", "width": 1.5, "is_modifier": true, "modifier": "alt"},
+        {"label": "Space", "key": "KEY_SPACE", "width": 5.0},
+        {"label": "Enter", "key": "KEY_ENTER", "width": 2.0}
+      ]
+    }
+  ]
+}

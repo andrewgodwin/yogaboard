@@ -1,0 +1,5 @@
+/build-dir
+/flatpak-repo
+/.claude
+/.flatpak-builder
+*.egg-info

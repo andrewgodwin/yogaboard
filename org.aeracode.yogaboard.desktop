@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Yogaboard
+Comment=Virtual keyboard for Wayland
+Exec=yogaboard
+Icon=org.aeracode.yogaboard
+Terminal=false
+Type=Application
+Categories=Utility;Accessibility;
+Keywords=keyboard;virtual;onscreen;osk;

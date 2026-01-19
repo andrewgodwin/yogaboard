@@ -1,0 +1,69 @@
+{
+  "app-id": "org.aeracode.yogaboard",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "48",
+  "sdk": "org.gnome.Sdk",
+  "command": "yogaboard",
+  "build-options": {
+    "env": {
+      "V": "1"
+    },
+    "build-args": [
+      "--unset-env=LD_PRELOAD"
+    ]
+  },
+  "finish-args": [
+    "--share=ipc",
+    "--socket=wayland",
+    "--socket=fallback-x11",
+    "--device=all",
+    "--filesystem=xdg-run/at-spi:ro"
+  ],
+  "modules": [
+    {
+      "name": "gtk4-layer-shell",
+      "buildsystem": "meson",
+      "config-opts": [
+        "-Dexamples=false",
+        "-Ddocs=false",
+        "-Dtests=false"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://github.com/wmww/gtk4-layer-shell/archive/refs/tags/v1.0.4.tar.gz",
+          "sha256": "7fe327dc3740e4b6f5edfd855e23f84b1ac1ec6854b731047b95df7feb46498b"
+        }
+      ]
+    },
+    {
+      "name": "python-uinput",
+      "buildsystem": "simple",
+      "build-commands": [
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"python-uinput\" --no-build-isolation"
+      ],
+      "sources": [
+        {
+          "type": "file",
+          "url": "https://files.pythonhosted.org/packages/1d/58/f0ac92b19b3a9eda6a1d88d48bd17993d8a749600d981715b9be372ded5d/python-uinput-1.0.1.tar.gz",
+          "sha256": "853697344b64df5537d4ae32ba6fbcf0515d51a9010910f5d5019959038b6eba"
+        }
+      ]
+    },
+    {
+      "name": "yogaboard",
+      "buildsystem": "simple",
+      "build-commands": [
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} . --no-build-isolation",
+        "install -Dm644 org.aeracode.yogaboard.desktop ${FLATPAK_DEST}/share/applications/org.aeracode.yogaboard.desktop",
+        "install -Dm644 org.aeracode.yogaboard.svg ${FLATPAK_DEST}/share/icons/hicolor/scalable/apps/org.aeracode.yogaboard.svg"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "."
+        }
+      ]
+    }
+  ]
+}

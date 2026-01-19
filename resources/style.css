@@ -1,0 +1,40 @@
+/* Dark blue-grey styling for yogaboard virtual keyboard */
+
+.keyboard-widget {
+    background-color: #1a1f2e;
+    padding: 10px;
+    border-radius: 0;
+}
+
+button.keyboard-key {
+    background: #2d3748;
+    background-color: #2d3748;
+    background-image: none;
+    color: #ffffff;
+    border: 1px solid #4a5568;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: 600;
+    min-width: 60px;
+    min-height: 50px;
+    box-shadow: none;
+}
+
+button.keyboard-key:hover {
+    background: #3d4758;
+    background-color: #3d4758;
+    background-image: none;
+}
+
+button.keyboard-key:active {
+    background: #4d5768;
+    background-color: #4d5768;
+    background-image: none;
+}
+
+button.modifier-key {
+    background: #3a4555;
+    background-color: #3a4555;
+    background-image: none;
+    font-size: 16px;
+}

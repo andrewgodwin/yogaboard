@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yogaboard"
+version = "0.1.0"
+description = "GTK4 virtual keyboard for Wayland using uinput"
+requires-python = ">=3.10"
+dependencies = [
+    "PyGObject>=3.42",
+    "python-uinput>=0.11.2",
+]
+
+[project.scripts]
+yogaboard = "yogaboard.main:main"
+
+[tool.setuptools]
+packages = ["yogaboard", "yogaboard.ui", "yogaboard.input_device", "yogaboard.layout", "yogaboard.input"]
+
+[tool.setuptools.package-data]
+yogaboard = ["../layouts/*.json", "../resources/*.css"]

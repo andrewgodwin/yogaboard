@@ -71,6 +71,11 @@
           "width": 1.0
         },
         {
+          "label": "Ins",
+          "key": "KEY_INSERT",
+          "width": 1.0
+        },
+        {
           "label": "Del",
           "key": "KEY_DELETE",
           "width": 1.0
@@ -398,7 +403,7 @@
           ]
         },
         {
-          "label": "Super",
+          "label": "Meta",
           "key": "KEY_LEFTMETA",
           "width": 1,
           "classes": [
@@ -442,6 +447,11 @@
         {
           "label": "🡑",
           "key": "KEY_UP",
+          "width": 1.0
+        },
+        {
+          "label": "↓",
+          "key": "KEY_DOWN",
           "width": 1.0
         },
         {

@@ -22,6 +22,7 @@ window {
 .keyboard-key:active {
     background: #4d5768;
     border-top: 3px solid #4a5568;
+    border-bottom: 1px solid #242a38;
 }
 
 .modifier {

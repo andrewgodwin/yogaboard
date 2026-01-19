@@ -2,7 +2,7 @@
 
 import json
 import uinput
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 
@@ -13,10 +13,9 @@ class Key:
     label: str
     key: str  # uinput key name (e.g., "KEY_A")
     width: float = 1.0
-    is_modifier: bool = False
+    classes: list[str] = field(default_factory=list)
     modifier: Optional[str] = None
     secondary_label: Optional[str] = None
-    is_mode_toggle: bool = False
 
     def get_uinput_key(self) -> tuple[int, int]:
         return getattr(uinput, self.key)
@@ -27,6 +26,7 @@ class Row:
     """Represents a row of keys."""
 
     keys: List[Key]
+    height: int = 100
 
 
 @dataclass
@@ -58,10 +58,9 @@ class LayoutParser:
         rows = []
         for row_data in data["rows"]:
             keys = [Key(**key_data) for key_data in row_data["keys"]]
-            rows.append(Row(keys=keys))
+            del row_data["keys"]
+            rows.append(Row(keys=keys, **row_data))
 
         return Layout(
-            name=data["name"],
-            rows=rows,
-            window_height=data.get("window_height")
+            name=data["name"], rows=rows, window_height=data.get("window_height")
         )

@@ -53,14 +53,14 @@ class KeyButton(Gtk.Box):
 
         self.add_css_class("keyboard-key")
 
-        if key.is_modifier:
-            self.add_css_class("modifier-key")
+        for css_class in key.classes:
+            self.add_css_class(css_class)
 
         # Set minimum height and allow horizontal expansion
         # Height = 50px, width expands based on key.width multiplier
-        self.set_size_request(-1, 50)
+        self.set_size_request(-1, -1)
         self.set_hexpand(True)
 
         # Use natural width as a weight for expansion
         if key.width != 1.0:
-            self.set_size_request(int(60 * key.width), 50)
+            self.set_size_request(int(60 * key.width), -1)

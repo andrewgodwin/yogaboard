@@ -1,14 +1,18 @@
 """Touch event handling with multitouch modifier support."""
 
+from __future__ import annotations
+
 import gi
+from typing import TYPE_CHECKING
 
 from yogaboard.input_device.uinput_keyboard import UInputKeyboard
 from yogaboard.ui.key_button import KeyButton
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gdk
-from .modifier_state import ModifierState
-import traceback
+
+if TYPE_CHECKING:
+    from yogaboard.main import KeyboardApp
 
 
 class TouchHandler:
@@ -17,9 +21,9 @@ class TouchHandler:
     to our virtual keyboard.
     """
 
-    def __init__(self, uinput_keyboard: UInputKeyboard, app=None):
+    def __init__(self, uinput_keyboard: UInputKeyboard, app):
         self.keyboard = uinput_keyboard
-        self.app = app  # Reference to KeyboardApp for mode toggling
+        self.app: KeyboardApp = app
 
     def setup_gestures(self, keyboard_widget):
         """
@@ -38,10 +42,9 @@ class TouchHandler:
             btn.add_controller(gesture)
 
     def _on_button_press(self, gesture, n_press, x, y, button: KeyButton):
-        # Check if this is the mode toggle button
-        if hasattr(button.key, 'is_mode_toggle') and button.key.is_mode_toggle:
-            if self.app:
-                self.app.toggle_mode()
+        # Handle special keys that don't go to uinput
+        if button.key.key.startswith("SPECIAL_"):
+            self._handle_special_key(button.key.key)
             return
 
         # Send the key press
@@ -49,14 +52,29 @@ class TouchHandler:
         self.keyboard.send_key(key_code, pressed=True)
 
     def _on_button_release(self, gesture, n_press, x, y, button: KeyButton):
+        # Special keys don't need release events
+        if button.key.key.startswith("SPECIAL_"):
+            return
+
         # Send key release
         key_code = button.key.get_uinput_key()
         self.keyboard.send_key(key_code, pressed=False)
 
     def _on_button_cancel(self, gesture, sequence, button: KeyButton):
+        # Special keys don't need release events
+        if button.key.key.startswith("SPECIAL_"):
+            return
+
         # Send key release
         key_code = button.key.get_uinput_key()
         self.keyboard.send_key(key_code, pressed=False)
+
+    def _handle_special_key(self, key: str):
+        """Handle special keys that trigger application actions instead of uinput."""
+        if key == "SPECIAL_CLOSE":
+            self.app.quit()
+        elif key == "SPECIAL_MODE_TOGGLE":
+            self.app.toggle_mode()
 
     def cleanup(self):
         """Cleanup resources (no-op since uinput keyboard manages its own thread)."""

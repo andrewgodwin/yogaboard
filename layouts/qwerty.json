@@ -1,8 +1,9 @@
 {
   "name": "QWERTY",
-  "window_height": 500,
+  "window_height": 450,
   "rows": [
     {
+      "height": 50,
       "keys": [
         {
           "label": "Esc",
@@ -67,6 +68,11 @@
         {
           "label": "F12",
           "key": "KEY_F12",
+          "width": 1.0
+        },
+        {
+          "label": "Del",
+          "key": "KEY_DELETE",
           "width": 1.0
         }
       ]
@@ -300,7 +306,7 @@
           "secondary_label": "\""
         },
         {
-          "label": "Enter",
+          "label": "↵",
           "key": "KEY_ENTER",
           "width": 2.25
         }
@@ -309,10 +315,13 @@
     {
       "keys": [
         {
-          "label": "Shift",
+          "label": "⇧",
           "key": "KEY_LEFTSHIFT",
           "width": 2.25,
-          "is_modifier": true
+          "classes": [
+            "modifier",
+            "shift"
+          ]
         },
         {
           "label": "Z",
@@ -368,10 +377,13 @@
           "secondary_label": "?"
         },
         {
-          "label": "Shift",
+          "label": "⇧",
           "key": "KEY_RIGHTSHIFT",
           "width": 2.75,
-          "is_modifier": true
+          "classes": [
+            "modifier",
+            "shift"
+          ]
         }
       ]
     },
@@ -381,22 +393,28 @@
           "label": "Ctrl",
           "key": "KEY_LEFTCTRL",
           "width": 1,
-          "is_modifier": true
+          "classes": [
+            "modifier"
+          ]
         },
         {
           "label": "Super",
           "key": "KEY_LEFTMETA",
           "width": 1,
-          "is_modifier": true
+          "classes": [
+            "modifier"
+          ]
         },
         {
           "label": "Alt",
           "key": "KEY_LEFTALT",
           "width": 1,
-          "is_modifier": true
+          "classes": [
+            "modifier"
+          ]
         },
         {
-          "label": "Space",
+          "label": "",
           "key": "KEY_SPACE",
           "width": 11
         },
@@ -404,31 +422,32 @@
           "label": "Alt",
           "key": "KEY_RIGHTALT",
           "width": 1,
-          "is_modifier": true
-        },
-        {
-          "label": "Super",
-          "key": "KEY_RIGHTMETA",
-          "width": 1,
-          "is_modifier": true
-        },
-        {
-          "label": "Menu",
-          "key": "KEY_COMPOSE",
-          "width": 1,
-          "is_modifier": true
-        },
-        {
-          "label": "Ctrl",
-          "key": "KEY_RIGHTCTRL",
-          "width": 1,
-          "is_modifier": true
+          "classes": [
+            "modifier"
+          ]
         },
         {
           "label": "⇅",
-          "key": "KEY_UNKNOWN",
+          "key": "SPECIAL_MODE_TOGGLE",
           "width": 1.0,
-          "is_mode_toggle": true
+          "classes": [
+            "mode"
+          ]
+        },
+        {
+          "label": "←",
+          "key": "KEY_LEFT",
+          "width": 1.0
+        },
+        {
+          "label": "🡑",
+          "key": "KEY_UP",
+          "width": 1.0
+        },
+        {
+          "label": "→",
+          "key": "KEY_RIGHT",
+          "width": 1.0
         }
       ]
     }

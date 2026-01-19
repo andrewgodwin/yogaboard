@@ -20,12 +20,6 @@
     box-shadow: none;
 }
 
-.keyboard-key:hover {
-    background: #3d4758;
-    background-color: #3d4758;
-    background-image: none;
-}
-
 .keyboard-key:active {
     background: #4d5768;
     background-color: #4d5768;
@@ -35,6 +29,7 @@
 .modifier-key {
     background: #3a4555;
     background-color: #3a4555;
+    color: #aaaaaa;
     background-image: none;
     font-size: 16px;
 }

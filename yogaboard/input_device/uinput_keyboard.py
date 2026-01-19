@@ -205,9 +205,6 @@ class UInputKeyboard:
         if not self.device:
             return
 
-        # Log the event for debugging
-        print(f"[uinput] {event.action}: key_code={event.key_code}")
-
         if event.action == "press":
             self.device.emit(event.key_code, 1)
         else:  # release

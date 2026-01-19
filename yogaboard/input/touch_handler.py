@@ -19,12 +19,6 @@ class TouchHandler:
 
     def __init__(self, uinput_keyboard: UInputKeyboard):
         self.keyboard = uinput_keyboard
-        # Map modifier names to their uinput key codes
-        self._modifier_keys = {
-            "shift": "KEY_LEFTSHIFT",
-            "ctrl": "KEY_LEFTCTRL",
-            "alt": "KEY_LEFTALT",
-        }
 
     def setup_gestures(self, keyboard_widget):
         """
@@ -43,59 +37,18 @@ class TouchHandler:
             btn.add_controller(gesture)
 
     def _on_button_press(self, gesture, n_press, x, y, button: KeyButton):
-        """
-        Handle button press event.
-
-        Args:
-            gesture: GestureClick that triggered the event
-            n_press: Number of consecutive presses
-            x: X coordinate of press (relative to button)
-            y: Y coordinate of press (relative to button)
-            button: KeyButton that was pressed
-        """
-        try:
-            # Send the key press
-            key_code = button.key.get_uinput_key()
-            self.keyboard.send_key(key_code, pressed=True)
-
-        except Exception as e:
-            print(f"Error in _on_button_press: {e}")
-            traceback.print_exc()
+        # Send the key press
+        key_code = button.key.get_uinput_key()
+        self.keyboard.send_key(key_code, pressed=True)
 
     def _on_button_release(self, gesture, n_press, x, y, button: KeyButton):
-        """
-        Handle button release event.
-
-        Args:
-            gesture: GestureClick that triggered the event
-            n_press: Number of consecutive presses
-            x: X coordinate of release (relative to button)
-            y: Y coordinate of release (relative to button)
-            button: KeyButton that was released
-        """
-        try:
-            # Send key release
-            key_code = button.key.get_uinput_key()
-            print(f"[touch] sending key release for '{button.key.label}'")
-            self.keyboard.send_key(key_code, pressed=False)
-
-        except Exception as e:
-            print(f"Error in _on_button_release: {e}")
-            traceback.print_exc()
-
-    def _on_button_cancel(self, gesture, sequence, button: KeyButton):
-        """
-        Handle gesture cancellation.
-
-        Args:
-            gesture: GestureClick that was cancelled
-            sequence: Event sequence that was cancelled
-            button: KeyButton associated with the gesture
-        """
-
         # Send key release
         key_code = button.key.get_uinput_key()
-        print(f"[touch] sending key release for '{button.key.label}'")
+        self.keyboard.send_key(key_code, pressed=False)
+
+    def _on_button_cancel(self, gesture, sequence, button: KeyButton):
+        # Send key release
+        key_code = button.key.get_uinput_key()
         self.keyboard.send_key(key_code, pressed=False)
 
     def cleanup(self):

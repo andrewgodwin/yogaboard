@@ -9,15 +9,25 @@ from gi.repository import Gtk
 class TouchpadWidget(Gtk.Box):
     """Widget that provides a virtual touchpad surface with controls."""
 
-    def __init__(self):
-        """Initialize the touchpad widget."""
-        super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+    def __init__(self, show_controls=True):
+        """
+        Initialize the touchpad widget.
 
-        # Add horizontal padding
+        Args:
+            show_controls: Whether to show mode/close buttons (False when embedded)
+        """
+        super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        self.show_controls = show_controls
+
+        # Add padding (less when embedded)
         self.set_margin_start(10)
         self.set_margin_end(10)
-        self.set_margin_top(10)
-        self.set_margin_bottom(10)
+        if show_controls:
+            self.set_margin_top(10)
+            self.set_margin_bottom(10)
+        else:
+            self.set_margin_top(0)
+            self.set_margin_bottom(10)
 
         # Main touch surface
         self.touchpad_area = Gtk.DrawingArea()
@@ -58,30 +68,35 @@ class TouchpadWidget(Gtk.Box):
 
         self.append(self.button_row)
 
-        # Control row at bottom
-        self.control_row = Gtk.Box(
-            orientation=Gtk.Orientation.HORIZONTAL, spacing=8
-        )
-        self.control_row.set_margin_top(8)
-        self.control_row.add_css_class("touchpad-controls")
+        # Control row at bottom (only if show_controls is True)
+        self.mode_button = None
+        self.close_button = None
 
-        # Mode toggle button
-        self.mode_button = Gtk.Button(label="⌨")
-        self.mode_button.set_hexpand(True)
-        self.mode_button.set_size_request(-1, 50)
-        self.mode_button.add_css_class("keyboard-key")
-        self.mode_button.add_css_class("mode")
-        self.control_row.append(self.mode_button)
+        if self.show_controls:
+            self.control_row = Gtk.Box(
+                orientation=Gtk.Orientation.HORIZONTAL, spacing=8
+            )
+            self.control_row.set_margin_top(8)
+            self.control_row.add_css_class("touchpad-controls")
 
-        # Close button
-        self.close_button = Gtk.Button(label="✕")
-        self.close_button.set_hexpand(True)
-        self.close_button.set_size_request(-1, 50)
-        self.close_button.add_css_class("keyboard-key")
-        self.close_button.add_css_class("close")
-        self.control_row.append(self.close_button)
+            # Mode toggle button
+            self.mode_button = Gtk.Button(label="⌨")
+            self.mode_button.set_hexpand(True)
+            self.mode_button.set_size_request(-1, 50)
+            self.mode_button.add_css_class("keyboard-key")
+            self.mode_button.add_css_class("mode")
+            self.control_row.append(self.mode_button)
 
-        self.append(self.control_row)
+            # Close button
+            self.close_button = Gtk.Button(label="✕")
+            self.close_button.set_hexpand(True)
+            self.close_button.set_size_request(-1, 50)
+            self.close_button.add_css_class("keyboard-key")
+            self.close_button.add_css_class("close")
+            self.control_row.append(self.close_button)
+
+            self.append(self.control_row)
+
         self.add_css_class("touchpad-widget")
 
     def _draw_touchpad(self, area, cr, width, height):

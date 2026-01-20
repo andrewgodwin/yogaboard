@@ -28,7 +28,8 @@ class KeyboardApp(Gtk.Application):
 
     MODE_KEYBOARD = "keyboard"
     MODE_SLIM = "slim"
-    MODE_TOUCHPAD = "touchpad"
+    MODE_FULL = "full"    # Keyboard + touchpad below (full height)
+    MODE_SMALL = "small"  # Keyboard + touchpad to the right
 
     def __init__(self):
         super().__init__(application_id="org.aeracode.yogaboard")
@@ -90,11 +91,13 @@ class KeyboardApp(Gtk.Application):
             self.quit()
 
     def toggle_mode(self):
-        """Cycle between keyboard, slim, and touchpad modes."""
+        """Cycle between keyboard, slim, full, and small modes."""
         if self.current_mode == self.MODE_KEYBOARD:
             self.switch_to_layout(self.MODE_SLIM)
         elif self.current_mode == self.MODE_SLIM:
-            self.switch_to_touchpad()
+            self.switch_to_full()
+        elif self.current_mode == self.MODE_FULL:
+            self.switch_to_small()
         else:
             self.switch_to_layout(self.MODE_KEYBOARD)
 
@@ -119,21 +122,63 @@ class KeyboardApp(Gtk.Application):
         # Re-setup touch handlers
         self.touch_handler.setup_gestures(self.keyboard_widget)
 
-    def switch_to_touchpad(self):
-        """Switch to touchpad mode."""
-        self.current_mode = self.MODE_TOUCHPAD
-
-        # Set touchpad height
-        self.window.set_default_size(-1, 400)
+    def switch_to_full(self):
+        """Switch to full mode: keyboard + touchpad below, full screen height."""
+        self.current_mode = self.MODE_FULL
 
         # Clear current widget
         self.window.set_child(None)
-        self.keyboard_widget = None
 
-        self.touchpad_widget = TouchpadWidget()
-        self.window.set_child(self.touchpad_widget)
+        # Create vertical container
+        container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
 
-        # Setup touchpad gesture handlers
+        # Add keyboard widget (QWERTY layout)
+        layout = self.layouts[self.MODE_KEYBOARD]
+        self.keyboard_widget = KeyboardWidget(layout)
+        container.append(self.keyboard_widget)
+
+        # Add touchpad widget below (no controls - keyboard has them)
+        self.touchpad_widget = TouchpadWidget(show_controls=False)
+        self.touchpad_widget.set_vexpand(True)
+        container.append(self.touchpad_widget)
+
+        self.window.set_child(container)
+
+        # Full screen height (use a large value, layer shell will constrain it)
+        self.window.set_default_size(-1, 800)
+
+        # Setup handlers
+        self.touch_handler.setup_gestures(self.keyboard_widget)
+        self.touchpad_handler.setup_gestures(self.touchpad_widget)
+
+    def switch_to_small(self):
+        """Switch to small mode: keyboard + touchpad to the right."""
+        self.current_mode = self.MODE_SMALL
+
+        # Clear current widget
+        self.window.set_child(None)
+
+        # Create horizontal container
+        container = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+
+        # Add keyboard widget (QWERTY layout)
+        layout = self.layouts[self.MODE_KEYBOARD]
+        self.keyboard_widget = KeyboardWidget(layout)
+        container.append(self.keyboard_widget)
+
+        # Add touchpad widget to the right (no controls - keyboard has them)
+        self.touchpad_widget = TouchpadWidget(show_controls=False)
+        self.touchpad_widget.set_size_request(300, -1)  # Fixed width for touchpad
+        container.append(self.touchpad_widget)
+
+        self.window.set_child(container)
+
+        # Use keyboard height
+        height = layout.window_height if layout.window_height else 400
+        self.window.set_default_size(-1, height)
+
+        # Setup handlers
+        self.touch_handler.setup_gestures(self.keyboard_widget)
         self.touchpad_handler.setup_gestures(self.touchpad_widget)
 
     def do_shutdown(self):

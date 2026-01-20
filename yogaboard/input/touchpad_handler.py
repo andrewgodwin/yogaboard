@@ -80,9 +80,11 @@ class TouchpadHandler:
         widget.middle_click_button.connect("clicked", self._on_middle_click)
         widget.right_click_button.connect("clicked", self._on_right_click)
 
-        # Connect control buttons
-        widget.mode_button.connect("clicked", self._on_mode_clicked)
-        widget.close_button.connect("clicked", self._on_close_clicked)
+        # Connect control buttons (if present)
+        if widget.mode_button:
+            widget.mode_button.connect("clicked", self._on_mode_clicked)
+        if widget.close_button:
+            widget.close_button.connect("clicked", self._on_close_clicked)
 
     def _on_drag_begin(self, gesture, start_x, start_y):
         """Handle start of drag gesture."""

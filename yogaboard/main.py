@@ -28,12 +28,12 @@ class KeyboardApp(Gtk.Application):
 
     MODE_KEYBOARD = "keyboard"
     MODE_SLIM = "slim"
-    MODE_FULL = "full"    # Keyboard + touchpad below (full height)
+    MODE_FULL = "full"  # Keyboard + touchpad below (full height)
     MODE_SMALL = "small"  # Keyboard + touchpad to the right
 
     def __init__(self):
         super().__init__(application_id="org.aeracode.yogaboard")
-        self.current_mode = self.MODE_KEYBOARD
+        self.current_mode = self.MODE_SLIM
         self.keyboard_widget = None
         self.touchpad_widget = None
 
@@ -43,19 +43,24 @@ class KeyboardApp(Gtk.Application):
             # Initialize uinput virtual keyboard
             self.uinput_keyboard = UInputKeyboard()
 
-            # Load both layouts
+            # Load layouts
             qwerty_layout_path = os.path.join(
                 os.path.dirname(__file__), "../layouts/qwerty.json"
             )
             slim_layout_path = os.path.join(
                 os.path.dirname(__file__), "../layouts/slim.json"
             )
+            compact_layout_path = os.path.join(
+                os.path.dirname(__file__), "../layouts/qwerty-compact.json"
+            )
             qwerty_layout = LayoutParser.load(qwerty_layout_path)
             slim_layout = LayoutParser.load(slim_layout_path)
+            compact_layout = LayoutParser.load(compact_layout_path)
 
             self.layouts = {
                 self.MODE_KEYBOARD: qwerty_layout,
-                self.MODE_SLIM: slim_layout
+                self.MODE_SLIM: slim_layout,
+                self.MODE_SMALL: compact_layout,
             }
 
             # Create main window
@@ -78,8 +83,8 @@ class KeyboardApp(Gtk.Application):
                 Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
             )
 
-            # Start in keyboard mode
-            self.switch_to_layout(self.MODE_KEYBOARD)
+            # Start in slim mode
+            self.switch_to_layout(self.MODE_SLIM)
 
             self.window.present()
 
@@ -114,6 +119,7 @@ class KeyboardApp(Gtk.Application):
 
         # Clear current widget
         self.window.set_child(None)
+        self.window.toggle_full(False)
         self.touchpad_widget = None
 
         self.keyboard_widget = KeyboardWidget(layout)
@@ -128,6 +134,7 @@ class KeyboardApp(Gtk.Application):
 
         # Clear current widget
         self.window.set_child(None)
+        self.window.toggle_full(True)
 
         # Create vertical container
         container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -145,24 +152,28 @@ class KeyboardApp(Gtk.Application):
         self.window.set_child(container)
 
         # Full screen height (use a large value, layer shell will constrain it)
-        self.window.set_default_size(-1, 800)
+        self.window.set_default_size(-1, 1000)
 
         # Setup handlers
         self.touch_handler.setup_gestures(self.keyboard_widget)
         self.touchpad_handler.setup_gestures(self.touchpad_widget)
 
     def switch_to_small(self):
-        """Switch to small mode: keyboard + touchpad to the right."""
+        """Switch to small mode: compact keyboard + touchpad to the right."""
         self.current_mode = self.MODE_SMALL
 
         # Clear current widget
         self.window.set_child(None)
+        self.window.toggle_full(False)
+
+        # Use compact layout
+        layout = self.layouts[self.MODE_SMALL]
+        height = layout.window_height if layout.window_height else 200
 
         # Create horizontal container
         container = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
 
-        # Add keyboard widget (QWERTY layout)
-        layout = self.layouts[self.MODE_KEYBOARD]
+        # Add keyboard widget (compact layout)
         self.keyboard_widget = KeyboardWidget(layout)
         container.append(self.keyboard_widget)
 
@@ -172,9 +183,6 @@ class KeyboardApp(Gtk.Application):
         container.append(self.touchpad_widget)
 
         self.window.set_child(container)
-
-        # Use keyboard height
-        height = layout.window_height if layout.window_height else 400
         self.window.set_default_size(-1, height)
 
         # Setup handlers

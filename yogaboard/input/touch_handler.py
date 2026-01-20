@@ -74,7 +74,14 @@ class TouchHandler:
         if key == "SPECIAL_CLOSE":
             self.app.quit()
         elif key == "SPECIAL_MODE_TOGGLE":
-            self.app.toggle_mode()
+            # Mode toggle button goes back to slim
+            self.app.switch_to_layout(self.app.MODE_SLIM)
+        elif key == "SPECIAL_MODE_KEYBOARD":
+            self.app.switch_to_layout(self.app.MODE_KEYBOARD)
+        elif key == "SPECIAL_MODE_FULL":
+            self.app.switch_to_full()
+        elif key == "SPECIAL_MODE_SMALL":
+            self.app.switch_to_small()
 
     def cleanup(self):
         """Cleanup resources (no-op since uinput keyboard manages its own thread)."""

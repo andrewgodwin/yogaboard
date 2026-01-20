@@ -38,6 +38,9 @@ class KeyboardWindow(Gtk.ApplicationWindow):
         # Set window size
         self.set_default_size(-1, 400)
 
+    def toggle_full(self, full: bool):
+        LayerShell.set_anchor(self, LayerShell.Edge.TOP, full)
+
     def _on_close_clicked(self, button):
         """Handle close button click."""
         self.app.quit()

@@ -54,8 +54,24 @@
           ]
         },
         {
-          "label": "⇅",
-          "key": "SPECIAL_MODE_TOGGLE",
+          "label": "⌨",
+          "key": "SPECIAL_MODE_KEYBOARD",
+          "width": 1.0,
+          "classes": [
+            "mode"
+          ]
+        },
+        {
+          "label": "▣",
+          "key": "SPECIAL_MODE_FULL",
+          "width": 1.0,
+          "classes": [
+            "mode"
+          ]
+        },
+        {
+          "label": "◫",
+          "key": "SPECIAL_MODE_SMALL",
           "width": 1.0,
           "classes": [
             "mode"

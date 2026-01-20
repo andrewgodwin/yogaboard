@@ -145,8 +145,12 @@ class KeyboardApp(Gtk.Application):
         container.append(self.keyboard_widget)
 
         # Add touchpad widget below (no controls - keyboard has them)
+        # Constrain to ~1/3 screen width, aligned to the right
         self.touchpad_widget = TouchpadWidget(show_controls=False)
         self.touchpad_widget.set_vexpand(True)
+        self.touchpad_widget.set_hexpand(False)
+        self.touchpad_widget.set_halign(Gtk.Align.CENTER)
+        self.touchpad_widget.set_size_request(700, -1)  # ~1/3 of typical screen width
         container.append(self.touchpad_widget)
 
         self.window.set_child(container)

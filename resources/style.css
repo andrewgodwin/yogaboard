@@ -53,3 +53,43 @@ window {
     font-size: 16px;
     font-weight: 400;
 }
+
+/* Touchpad widget styling */
+.touchpad-widget {
+    background-color: #1a1f2e;
+    padding: 10px;
+}
+
+.touchpad-area {
+    background: #252b3b;
+    border-radius: 8px 8px 0 0;
+    min-height: 250px;
+}
+
+.mouse-button-row {
+    margin-top: 0;
+}
+
+.mouse-button {
+    background: transparent;
+    border: 1px solid #3a4555;
+    border-top: none;
+    border-radius: 0;
+    min-height: 45px;
+}
+
+.mouse-button:first-child {
+    border-radius: 0 0 0 8px;
+}
+
+.mouse-button:last-child {
+    border-radius: 0 0 8px 0;
+}
+
+.mouse-button:active {
+    background: #3a4555;
+}
+
+.touchpad-controls {
+    margin-top: 10px;
+}

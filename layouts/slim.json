@@ -8,27 +8,42 @@
         {
           "label": "🔅",
           "key": "KEY_BRIGHTNESSDOWN",
-          "width": 1.0
+          "width": 1.0,
+          "classes": [
+            "smaller"
+          ]
         },
         {
           "label": "🔆",
           "key": "KEY_BRIGHTNESSUP",
-          "width": 1.0
+          "width": 1.0,
+          "classes": [
+            "smaller"
+          ]
         },
         {
           "label": "🔇",
           "key": "KEY_MUTE",
-          "width": 1.0
+          "width": 1.0,
+          "classes": [
+            "smaller"
+          ]
         },
         {
           "label": "🔉",
           "key": "KEY_VOLUMEDOWN",
-          "width": 1.0
+          "width": 1.0,
+          "classes": [
+            "smaller"
+          ]
         },
         {
           "label": "🔊",
           "key": "KEY_VOLUMEUP",
-          "width": 1.0
+          "width": 1.0,
+          "classes": [
+            "smaller"
+          ]
         },
         {
           "label": "⏮",

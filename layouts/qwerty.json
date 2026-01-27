@@ -445,14 +445,17 @@
           "width": 1.0
         },
         {
-          "label": "🡑",
-          "key": "KEY_UP",
-          "width": 1.0
-        },
-        {
-          "label": "↓",
-          "key": "KEY_DOWN",
-          "width": 1.0
+          "label": "",
+          "key": "",
+          "width": 1.0,
+          "top_key": {
+            "label": "↑",
+            "key": "KEY_UP"
+          },
+          "bottom_key": {
+            "label": "↓",
+            "key": "KEY_DOWN"
+          }
         },
         {
           "label": "→",

@@ -7,6 +7,17 @@ from typing import List, Optional
 
 
 @dataclass
+class SplitKey:
+    """Represents one half of a split key."""
+
+    label: str
+    key: str  # uinput key name (e.g., "KEY_UP")
+
+    def get_uinput_key(self) -> tuple[int, int]:
+        return getattr(uinput, self.key)
+
+
+@dataclass
 class Key:
     """Represents a single key on the keyboard."""
 
@@ -16,6 +27,13 @@ class Key:
     classes: list[str] = field(default_factory=list)
     modifier: Optional[str] = None
     secondary_label: Optional[str] = None
+    # Split key support: if both are set, key is rendered as top/bottom split
+    top_key: Optional[SplitKey] = None
+    bottom_key: Optional[SplitKey] = None
+
+    def is_split(self) -> bool:
+        """Return True if this is a vertically split key."""
+        return self.top_key is not None and self.bottom_key is not None
 
     def get_uinput_key(self) -> tuple[int, int]:
         return getattr(uinput, self.key)
@@ -57,7 +75,14 @@ class LayoutParser:
 
         rows = []
         for row_data in data["rows"]:
-            keys = [Key(**key_data) for key_data in row_data["keys"]]
+            keys = []
+            for key_data in row_data["keys"]:
+                # Parse nested SplitKey objects if present
+                if "top_key" in key_data and key_data["top_key"] is not None:
+                    key_data["top_key"] = SplitKey(**key_data["top_key"])
+                if "bottom_key" in key_data and key_data["bottom_key"] is not None:
+                    key_data["bottom_key"] = SplitKey(**key_data["bottom_key"])
+                keys.append(Key(**key_data))
             del row_data["keys"]
             rows.append(Row(keys=keys, **row_data))
 

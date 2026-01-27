@@ -75,10 +75,10 @@ class TouchpadHandler:
         self.zoom_gesture.connect("end", self._on_zoom_end)
         touchpad_area.add_controller(self.zoom_gesture)
 
-        # Connect mouse buttons
-        widget.left_click_button.connect("clicked", self._on_left_click)
-        widget.middle_click_button.connect("clicked", self._on_middle_click)
-        widget.right_click_button.connect("clicked", self._on_right_click)
+        # Connect mouse buttons with press/release for drag support
+        self._setup_mouse_button(widget.left_click_button, "left")
+        self._setup_mouse_button(widget.middle_click_button, "middle")
+        self._setup_mouse_button(widget.right_click_button, "right")
 
         # Connect control buttons (if present)
         if widget.mode_button:
@@ -168,17 +168,25 @@ class TouchpadHandler:
         self.scroll_accumulator_x = 0.0
         self.scroll_accumulator_y = 0.0
 
-    def _on_left_click(self, button):
-        """Handle left click button."""
-        self.touchpad.tap("left")
+    def _setup_mouse_button(self, button, button_name: str):
+        """Setup press/release handling for a mouse button using GestureClick on Box."""
+        gesture = Gtk.GestureClick.new()
+        gesture.set_button(0)
+        gesture.set_touch_only(True)
 
-    def _on_middle_click(self, button):
-        """Handle middle click button."""
-        self.touchpad.tap("middle")
+        def on_pressed(g, n_press, x, y):
+            self.touchpad.click(button_name, pressed=True)
 
-    def _on_right_click(self, button):
-        """Handle right click button."""
-        self.touchpad.tap("right")
+        def on_released(g, n_press, x, y):
+            self.touchpad.click(button_name, pressed=False)
+
+        def on_cancel(g, sequence):
+            self.touchpad.click(button_name, pressed=False)
+
+        gesture.connect("pressed", on_pressed)
+        gesture.connect("released", on_released)
+        gesture.connect("cancel", on_cancel)
+        button.add_controller(gesture)
 
     def _on_mode_clicked(self, button):
         """Handle mode toggle button click."""

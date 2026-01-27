@@ -20,14 +20,14 @@ class TouchpadWidget(Gtk.Box):
         self.show_controls = show_controls
 
         # Add padding (less when embedded)
-        self.set_margin_start(10)
-        self.set_margin_end(10)
+        self.set_margin_start(4)
+        self.set_margin_end(4)
         if show_controls:
-            self.set_margin_top(10)
-            self.set_margin_bottom(10)
+            self.set_margin_top(4)
+            self.set_margin_bottom(4)
         else:
             self.set_margin_top(0)
-            self.set_margin_bottom(10)
+            self.set_margin_bottom(4)
 
         # Main touch surface
         self.touchpad_area = Gtk.DrawingArea()
@@ -45,24 +45,27 @@ class TouchpadWidget(Gtk.Box):
         self.button_row.set_margin_top(2)
         self.button_row.add_css_class("mouse-button-row")
 
-        # Left click button
-        self.left_click_button = Gtk.Button()
+        # Left click button (using Box like KeyButton for proper press/release)
+        self.left_click_button = Gtk.Box()
         self.left_click_button.set_hexpand(True)
         self.left_click_button.set_size_request(-1, 45)
+        self.left_click_button.set_can_target(True)
         self.left_click_button.add_css_class("mouse-button")
         self.button_row.append(self.left_click_button)
 
         # Middle click button
-        self.middle_click_button = Gtk.Button()
+        self.middle_click_button = Gtk.Box()
         self.middle_click_button.set_hexpand(True)
         self.middle_click_button.set_size_request(-1, 45)
+        self.middle_click_button.set_can_target(True)
         self.middle_click_button.add_css_class("mouse-button")
         self.button_row.append(self.middle_click_button)
 
         # Right click button
-        self.right_click_button = Gtk.Button()
+        self.right_click_button = Gtk.Box()
         self.right_click_button.set_hexpand(True)
         self.right_click_button.set_size_request(-1, 45)
+        self.right_click_button.set_can_target(True)
         self.right_click_button.add_css_class("mouse-button")
         self.button_row.append(self.right_click_button)
 

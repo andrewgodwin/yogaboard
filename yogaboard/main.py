@@ -150,7 +150,7 @@ class KeyboardApp(Gtk.Application):
         self.touchpad_widget.set_vexpand(True)
         self.touchpad_widget.set_hexpand(False)
         self.touchpad_widget.set_halign(Gtk.Align.CENTER)
-        self.touchpad_widget.set_size_request(700, -1)  # ~1/3 of typical screen width
+        self.touchpad_widget.set_size_request(700, 400)  # ~1/3 of typical screen width
         container.append(self.touchpad_widget)
 
         self.window.set_child(container)

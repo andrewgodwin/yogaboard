@@ -5,7 +5,7 @@ window {
 
 .keyboard-widget {
     background-color: #1a1f2e;
-    padding: 10px;
+    padding: 7px 4px 4px 4px;
     border-radius: 0;
 }
 
@@ -25,27 +25,31 @@ window {
     border-bottom: 1px solid #242a38;
 }
 
-.modifier {
+.keyboard-key.modifier {
     background: #3a4555;
     color: #aaaaaa;
     background-image: none;
     font-size: 16px;
 }
 
-.shift {
+.keyboard-key.shift {
     font-size: 28px;
 }
 
-.mode {
+.keyboard-key.mode {
     background: #644421;
     border-bottom: 4px solid #3c2813;
     font-size: 20px;
 }
 
-.close {
+.keyboard-key.close {
     background: #580e0e;
     border-bottom: 4px solid #340909;
     font-size: 20px;
+}
+
+.keyboard-key.smaller {
+    font-size: 16px;
 }
 
 .secondary-label {
@@ -54,10 +58,20 @@ window {
     font-weight: 400;
 }
 
+/* Split key styling (e.g., up/down arrows in one key) */
+.split-key {
+    padding: 0;
+}
+
+.split-key-top,
+.split-key-bottom {
+    font-size: 18px;
+}
+
 /* Touchpad widget styling */
 .touchpad-widget {
     background-color: #1a1f2e;
-    padding: 10px;
+    padding: 4px;
 }
 
 .touchpad-area {

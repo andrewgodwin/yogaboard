@@ -44,6 +44,7 @@ class TouchpadHandler:
     SCROLL_SENSITIVITY = 0.15  # Multiplier for scroll events
     TAP_MAX_DURATION = 0.25  # Maximum seconds for a tap
     TAP_MAX_MOVEMENT = 15  # Maximum pixels for a tap
+    TAP_DRAG_WINDOW = 0.25  # Max seconds between tap and drag-start for tap-drag
 
     def __init__(self, uinput_touchpad: UInputTouchpad, app):
         self.touchpad = uinput_touchpad
@@ -54,6 +55,10 @@ class TouchpadHandler:
         self._max_fingers_in_gesture = 0  # For tap type detection
         self._any_finger_moved = False  # For tap detection
         self.first_touch_time = 0.0
+
+        # Tap-drag state: tap-release-tap-drag holds button down
+        self._last_tap_time = 0.0  # When last single-finger tap occurred
+        self._tap_drag_active = False  # Currently in tap-drag mode
 
         # Pointer accumulator for sub-pixel precision
         self.pointer_accumulator_x = 0.0
@@ -127,6 +132,11 @@ class TouchpadHandler:
             self.pointer_accumulator_x = 0.0
             self.pointer_accumulator_y = 0.0
 
+            # Check for tap-drag: single finger touch shortly after a tap
+            if (now - self._last_tap_time) < self.TAP_DRAG_WINDOW:
+                self._tap_drag_active = True
+                self.touchpad.click("left", pressed=True)
+
         # Store touch state
         self.active_touches[sequence] = TouchState(
             sequence=sequence,
@@ -186,11 +196,17 @@ class TouchpadHandler:
         # Remove this touch
         del self.active_touches[sequence]
 
-        # If all fingers are now up, check for tap gestures
+        # If all fingers are now up
         if len(self.active_touches) == 0:
-            tap_result = self._detect_tap_gesture()
-            if tap_result:
-                self.touchpad.tap(tap_result)
+            # End tap-drag if active
+            if self._tap_drag_active:
+                self.touchpad.click("left", pressed=False)
+                self._tap_drag_active = False
+            else:
+                # Check for tap gestures
+                tap_result = self._detect_tap_gesture()
+                if tap_result:
+                    self.touchpad.tap(tap_result)
 
     def _on_touch_cancel(self, event):
         """Handle cancelled touch - cleanup without triggering gestures."""
@@ -200,6 +216,10 @@ class TouchpadHandler:
 
         # If all touches cancelled, reset state
         if len(self.active_touches) == 0:
+            # Release tap-drag if active
+            if self._tap_drag_active:
+                self.touchpad.click("left", pressed=False)
+                self._tap_drag_active = False
             self._reset_gesture_state()
 
     def _reset_gesture_state(self):
@@ -262,6 +282,8 @@ class TouchpadHandler:
 
         # Determine tap type based on max finger count during gesture
         if self._max_fingers_in_gesture == 1:
+            # Record tap time for potential tap-drag
+            self._last_tap_time = time.monotonic()
             return "left"
         elif self._max_fingers_in_gesture == 2:
             return "right"
@@ -300,4 +322,7 @@ class TouchpadHandler:
 
     def cleanup(self):
         """Cleanup resources."""
+        if self._tap_drag_active:
+            self.touchpad.click("left", pressed=False)
+            self._tap_drag_active = False
         self._reset_gesture_state()

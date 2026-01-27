@@ -21,7 +21,7 @@ window {
 
 .keyboard-key:active {
     background: #4d5768;
-    border-top: 3px solid #4a5568;
+    border-top: 4px solid #242a38;
     border-bottom: 1px solid #242a38;
 }
 
@@ -30,6 +30,10 @@ window {
     color: #aaaaaa;
     background-image: none;
     font-size: 16px;
+}
+
+.keyboard-key.modifier:active {
+    background: #4d5768;
 }
 
 .keyboard-key.shift {
@@ -56,16 +60,6 @@ window {
     color: #888888;
     font-size: 16px;
     font-weight: 400;
-}
-
-/* Split key styling (e.g., up/down arrows in one key) */
-.split-key {
-    padding: 0;
-}
-
-.split-key-top,
-.split-key-bottom {
-    font-size: 18px;
 }
 
 /* Touchpad widget styling */

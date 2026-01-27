@@ -47,18 +47,6 @@ class TouchHandler:
             self._handle_special_key(button.key.key)
             return
 
-        # Handle split keys - determine which half was pressed
-        if button.key.is_split():
-            height = button.get_height()
-            if y < height / 2:
-                key_code = button.key.top_key.get_uinput_key()
-            else:
-                key_code = button.key.bottom_key.get_uinput_key()
-            self.keyboard.send_key(key_code, pressed=True)
-            # Store which half was pressed for the release event
-            button._active_split_key = key_code
-            return
-
         # Send the key press
         key_code = button.key.get_uinput_key()
         self.keyboard.send_key(key_code, pressed=True)
@@ -68,14 +56,6 @@ class TouchHandler:
         if button.key.key.startswith("SPECIAL_"):
             return
 
-        # Handle split keys - release the key that was pressed
-        if button.key.is_split():
-            key_code = getattr(button, "_active_split_key", None)
-            if key_code:
-                self.keyboard.send_key(key_code, pressed=False)
-                button._active_split_key = None
-            return
-
         # Send key release
         key_code = button.key.get_uinput_key()
         self.keyboard.send_key(key_code, pressed=False)
@@ -83,14 +63,6 @@ class TouchHandler:
     def _on_button_cancel(self, gesture, sequence, button: KeyButton):
         # Special keys don't need release events
         if button.key.key.startswith("SPECIAL_"):
-            return
-
-        # Handle split keys - release the key that was pressed
-        if button.key.is_split():
-            key_code = getattr(button, "_active_split_key", None)
-            if key_code:
-                self.keyboard.send_key(key_code, pressed=False)
-                button._active_split_key = None
             return
 
         # Send key release

@@ -21,11 +21,8 @@ class KeyButton(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.key = key
 
-        # Split key: render as two vertically stacked labels
-        if key.is_split():
-            self._build_split_key(key)
         # If there's a secondary label, use an overlay layout
-        elif key.secondary_label:
+        if key.secondary_label:
             self._build_secondary_label_key(key)
         else:
             # Just a single label
@@ -42,24 +39,6 @@ class KeyButton(Gtk.Box):
         # Set minimum width based on key.width multiplier and allow horizontal expansion
         self.set_size_request(int(60 * key.width), -1)
         self.set_hexpand(True)
-
-    def _build_split_key(self, key: Key):
-        """Build a vertically split key with top and bottom halves."""
-        self.add_css_class("split-key")
-
-        # Top half
-        self.top_label = Gtk.Label(label=key.top_key.label)
-        self.top_label.set_hexpand(True)
-        self.top_label.set_vexpand(True)
-        self.top_label.add_css_class("split-key-top")
-        self.append(self.top_label)
-
-        # Bottom half
-        self.bottom_label = Gtk.Label(label=key.bottom_key.label)
-        self.bottom_label.set_hexpand(True)
-        self.bottom_label.set_vexpand(True)
-        self.bottom_label.add_css_class("split-key-bottom")
-        self.append(self.bottom_label)
 
     def _build_secondary_label_key(self, key: Key):
         """Build a key with a secondary label (e.g., shift character)."""

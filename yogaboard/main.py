@@ -39,6 +39,8 @@ class KeyboardApp(Gtk.Application):
         self.touchpad_widget = None
         self.settings_manager = SettingsManager()
         self.settings_dialog = None
+        self.base_css_provider = None
+        self.theme_css_provider = None
 
     def do_activate(self):
         """Initialize and show the virtual keyboard."""
@@ -81,15 +83,22 @@ class KeyboardApp(Gtk.Application):
                 self.uinput_touchpad, app=self, settings_manager=self.settings_manager
             )
 
-            # Load CSS styling
-            css_provider = Gtk.CssProvider()
+            # Load base CSS styling
+            self.base_css_provider = Gtk.CssProvider()
             css_path = os.path.join(os.path.dirname(__file__), "../resources/style.css")
-            css_provider.load_from_path(css_path)
+            self.base_css_provider.load_from_path(css_path)
             Gtk.StyleContext.add_provider_for_display(
                 self.window.get_display(),
-                css_provider,
+                self.base_css_provider,
                 Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
             )
+
+            # Load theme CSS (on top of base)
+            self.theme_css_provider = Gtk.CssProvider()
+            self._apply_theme(self.settings_manager.appearance.color_scheme)
+
+            # Register for settings changes
+            self.settings_manager.add_change_callback(self._on_settings_changed)
 
             # Start in slim mode
             self.switch_to_layout(self.MODE_SLIM)
@@ -208,6 +217,36 @@ class KeyboardApp(Gtk.Application):
 
             self.settings_dialog = SettingsDialog(self, self.settings_manager)
             self.settings_dialog.present()
+
+    def _apply_theme(self, theme_id: str):
+        """Apply a color scheme theme."""
+        display = self.window.get_display()
+
+        # Remove existing theme provider if present
+        if self.theme_css_provider is not None:
+            Gtk.StyleContext.remove_provider_for_display(display, self.theme_css_provider)
+
+        # Create new provider and load theme
+        self.theme_css_provider = Gtk.CssProvider()
+
+        if theme_id != "default":
+            theme_path = os.path.join(
+                os.path.dirname(__file__),
+                f"../resources/themes/{theme_id}.css"
+            )
+            if os.path.exists(theme_path):
+                self.theme_css_provider.load_from_path(theme_path)
+
+        # Add at higher priority than base (so it overrides)
+        Gtk.StyleContext.add_provider_for_display(
+            display,
+            self.theme_css_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION + 1,
+        )
+
+    def _on_settings_changed(self, settings: SettingsManager):
+        """Handle settings changes including theme updates."""
+        self._apply_theme(settings.appearance.color_scheme)
 
     def do_shutdown(self):
         """Cleanup when application is closing."""

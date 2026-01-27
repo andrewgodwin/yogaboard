@@ -18,6 +18,13 @@ class TouchpadSettings:
     tap_drag_window: float = 0.25
 
 
+@dataclass
+class AppearanceSettings:
+    """Appearance-related settings."""
+
+    color_scheme: str = "default"
+
+
 class SettingsManager:
     """Handles loading, saving, and accessing application settings."""
 
@@ -26,6 +33,7 @@ class SettingsManager:
 
     def __init__(self):
         self.touchpad = TouchpadSettings()
+        self.appearance = AppearanceSettings()
         self._config_path: str | None = None
         self._callbacks: list[Callable[[SettingsManager], None]] = []
 
@@ -51,6 +59,10 @@ class SettingsManager:
                     for key, value in data["touchpad"].items():
                         if hasattr(self.touchpad, key):
                             setattr(self.touchpad, key, value)
+                if "appearance" in data:
+                    for key, value in data["appearance"].items():
+                        if hasattr(self.appearance, key):
+                            setattr(self.appearance, key, value)
             except (json.JSONDecodeError, IOError):
                 # Use defaults on error
                 pass
@@ -61,7 +73,10 @@ class SettingsManager:
         config_dir = os.path.dirname(config_path)
         os.makedirs(config_dir, exist_ok=True)
         with open(config_path, "w") as f:
-            json.dump({"touchpad": asdict(self.touchpad)}, f, indent=2)
+            json.dump({
+                "touchpad": asdict(self.touchpad),
+                "appearance": asdict(self.appearance),
+            }, f, indent=2)
 
     def add_change_callback(self, callback: Callable[[SettingsManager], None]):
         """Register a callback for settings changes."""
@@ -71,3 +86,10 @@ class SettingsManager:
         """Notify all observers that settings changed."""
         for callback in self._callbacks:
             callback(self)
+
+    def get_available_themes(self) -> list[tuple[str, str]]:
+        """Return list of (theme_id, display_name) tuples."""
+        return [
+            ("default", "Default"),
+            ("dark", "Dark"),
+        ]

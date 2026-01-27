@@ -19,4 +19,4 @@ yogaboard = "yogaboard.main:main"
 packages = ["yogaboard", "yogaboard.ui", "yogaboard.input_device", "yogaboard.layout", "yogaboard.input"]
 
 [tool.setuptools.package-data]
-yogaboard = ["../layouts/*.json", "../resources/*.css"]
+yogaboard = ["../layouts/*.json", "../resources/*.css", "../resources/themes/*.css"]

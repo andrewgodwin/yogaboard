@@ -1,0 +1,78 @@
+/* Dark theme - black background with darker keys */
+
+window {
+    background-color: #000000;
+}
+
+.keyboard-widget {
+    background-color: #000000;
+}
+
+.keyboard-key {
+    background: #1a1a1a;
+    color: #e0e0e0;
+    border-bottom: 4px solid #0a0a0a;
+}
+
+.keyboard-key:active {
+    background: #2a2a2a;
+    border-top: 4px solid #0a0a0a;
+    border-bottom: 1px solid #0a0a0a;
+}
+
+.keyboard-key.modifier {
+    background: #1f1f1f;
+    color: #888888;
+}
+
+.keyboard-key.modifier:active {
+    background: #2a2a2a;
+}
+
+.keyboard-key.mode {
+    background: #3d2a11;
+    border-bottom: 4px solid #261a0a;
+}
+
+.keyboard-key.close {
+    background: #3d0a0a;
+    border-bottom: 4px solid #260606;
+}
+
+.secondary-label {
+    color: #666666;
+}
+
+/* Touchpad widget styling */
+.touchpad-widget {
+    background-color: #000000;
+}
+
+.touchpad-area {
+    background: #0d0d0d;
+}
+
+.mouse-button {
+    border: 1px solid #1f1f1f;
+}
+
+.mouse-button:active {
+    background: #1f1f1f;
+}
+
+/* Settings dialog styling */
+window scale trough {
+    background: #1a1a1a;
+}
+
+window scale highlight {
+    background: #3d2a11;
+}
+
+window button {
+    background: #1a1a1a;
+}
+
+window button:hover {
+    background: #2a2a2a;
+}

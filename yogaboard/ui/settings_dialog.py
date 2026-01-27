@@ -22,7 +22,7 @@ class SettingsDialog(Gtk.Window):
         self.settings_manager = settings_manager
 
         # Regular window (not layer-shell) for keyboard focus
-        self.set_default_size(400, 300)
+        self.set_default_size(400, 380)
         self.set_resizable(False)
 
         # Main container
@@ -32,7 +32,22 @@ class SettingsDialog(Gtk.Window):
         main_box.set_margin_start(20)
         main_box.set_margin_end(20)
 
-        # Section header
+        # Appearance section header
+        appearance_header = Gtk.Label(label="Appearance")
+        appearance_header.add_css_class("title-2")
+        appearance_header.set_halign(Gtk.Align.START)
+        main_box.append(appearance_header)
+
+        # Color scheme dropdown
+        scheme_row = self._create_dropdown_row(
+            "Color Scheme",
+            options=settings_manager.get_available_themes(),
+            current=settings_manager.appearance.color_scheme,
+        )
+        self.scheme_dropdown = scheme_row.get_last_child()
+        main_box.append(scheme_row)
+
+        # Touchpad section header
         header = Gtk.Label(label="Touchpad Settings")
         header.add_css_class("title-2")
         header.set_halign(Gtk.Align.START)
@@ -103,14 +118,49 @@ class SettingsDialog(Gtk.Window):
 
         return box
 
+    def _create_dropdown_row(
+        self, label: str, options: list[tuple[str, str]], current: str
+    ) -> Gtk.Box:
+        """Create a labeled dropdown row."""
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        box.set_margin_top(4)
+        box.set_margin_bottom(4)
+
+        lbl = Gtk.Label(label=label)
+        lbl.set_halign(Gtk.Align.START)
+        lbl.set_hexpand(True)
+        box.append(lbl)
+
+        # Store option values for retrieval
+        self._scheme_values = [opt[0] for opt in options]
+
+        # Create string list with display names
+        string_list = Gtk.StringList.new([opt[1] for opt in options])
+
+        dropdown = Gtk.DropDown(model=string_list)
+        dropdown.set_size_request(150, -1)
+
+        # Set current selection
+        try:
+            current_index = self._scheme_values.index(current)
+            dropdown.set_selected(current_index)
+        except ValueError:
+            dropdown.set_selected(0)
+
+        box.append(dropdown)
+        return box
+
     def _on_apply(self, button):
         """Save settings and notify handlers."""
-        settings = self.settings_manager.touchpad
+        # Touchpad settings
+        touchpad = self.settings_manager.touchpad
+        touchpad.pointer_sensitivity = self.pointer_scale.get_value()
+        touchpad.scroll_sensitivity = self.scroll_scale.get_value()
+        touchpad.tap_drag_enabled = self.tap_drag_check.get_active()
 
-        # Get values from UI
-        settings.pointer_sensitivity = self.pointer_scale.get_value()
-        settings.scroll_sensitivity = self.scroll_scale.get_value()
-        settings.tap_drag_enabled = self.tap_drag_check.get_active()
+        # Appearance settings
+        selected_index = self.scheme_dropdown.get_selected()
+        self.settings_manager.appearance.color_scheme = self._scheme_values[selected_index]
 
         # Save to disk
         self.settings_manager.save()

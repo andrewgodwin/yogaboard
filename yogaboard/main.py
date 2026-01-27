@@ -20,6 +20,7 @@ from yogaboard.input_device.uinput_touchpad import UInputTouchpad
 from yogaboard.input.touch_handler import TouchHandler
 from yogaboard.input.touchpad_handler import TouchpadHandler
 from yogaboard.input.modifier_state import ModifierState
+from yogaboard.settings import SettingsManager
 import os
 
 
@@ -36,10 +37,15 @@ class KeyboardApp(Gtk.Application):
         self.current_mode = self.MODE_SLIM
         self.keyboard_widget = None
         self.touchpad_widget = None
+        self.settings_manager = SettingsManager()
+        self.settings_dialog = None
 
     def do_activate(self):
         """Initialize and show the virtual keyboard."""
         try:
+            # Load settings
+            self.settings_manager.load()
+
             # Initialize uinput virtual keyboard
             self.uinput_keyboard = UInputKeyboard()
 
@@ -71,7 +77,9 @@ class KeyboardApp(Gtk.Application):
 
             # Initialize uinput virtual touchpad
             self.uinput_touchpad = UInputTouchpad()
-            self.touchpad_handler = TouchpadHandler(self.uinput_touchpad, app=self)
+            self.touchpad_handler = TouchpadHandler(
+                self.uinput_touchpad, app=self, settings_manager=self.settings_manager
+            )
 
             # Load CSS styling
             css_provider = Gtk.CssProvider()
@@ -192,6 +200,14 @@ class KeyboardApp(Gtk.Application):
         # Setup handlers
         self.touch_handler.setup_gestures(self.keyboard_widget)
         self.touchpad_handler.setup_gestures(self.touchpad_widget)
+
+    def open_settings(self):
+        """Open the settings dialog."""
+        if self.settings_dialog is None or not self.settings_dialog.is_visible():
+            from yogaboard.ui.settings_dialog import SettingsDialog
+
+            self.settings_dialog = SettingsDialog(self, self.settings_manager)
+            self.settings_dialog.present()
 
     def do_shutdown(self):
         """Cleanup when application is closing."""

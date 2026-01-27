@@ -61,6 +61,14 @@
           "width": 1.0
         },
         {
+          "label": "⚙",
+          "key": "SPECIAL_SETTINGS",
+          "width": 1.0,
+          "classes": [
+            "modifier"
+          ]
+        },
+        {
           "label": "✕",
           "key": "SPECIAL_CLOSE",
           "width": 1.0,

@@ -82,6 +82,8 @@ class TouchHandler:
             self.app.switch_to_full()
         elif key == "SPECIAL_MODE_SMALL":
             self.app.switch_to_small()
+        elif key == "SPECIAL_SETTINGS":
+            self.app.open_settings()
 
     def cleanup(self):
         """Cleanup resources (no-op since uinput keyboard manages its own thread)."""

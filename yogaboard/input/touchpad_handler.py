@@ -15,6 +15,7 @@ from gi.repository import Gtk, Gdk
 
 if TYPE_CHECKING:
     from yogaboard.main import KeyboardApp
+    from yogaboard.settings import SettingsManager
 
 
 @dataclass
@@ -39,16 +40,35 @@ class TouchpadHandler:
     over gesture recognition, enabling tiny movements and multi-finger taps.
     """
 
-    # Gesture tuning parameters
-    POINTER_SENSITIVITY = 2.0  # Multiplier for pointer motion
-    SCROLL_SENSITIVITY = 0.15  # Multiplier for scroll events
-    TAP_MAX_DURATION = 0.25  # Maximum seconds for a tap
-    TAP_MAX_MOVEMENT = 15  # Maximum pixels for a tap
-    TAP_DRAG_WINDOW = 0.25  # Max seconds between tap and drag-start for tap-drag
+    # Default gesture tuning parameters
+    DEFAULT_POINTER_SENSITIVITY = 2.0
+    DEFAULT_SCROLL_SENSITIVITY = 0.15
+    DEFAULT_TAP_MAX_DURATION = 0.25
+    DEFAULT_TAP_MAX_MOVEMENT = 15
+    DEFAULT_TAP_DRAG_ENABLED = True
+    DEFAULT_TAP_DRAG_WINDOW = 0.25
 
-    def __init__(self, uinput_touchpad: UInputTouchpad, app):
+    def __init__(
+        self,
+        uinput_touchpad: UInputTouchpad,
+        app,
+        settings_manager: SettingsManager | None = None,
+    ):
         self.touchpad = uinput_touchpad
         self.app: KeyboardApp = app
+        self.settings_manager = settings_manager
+
+        # Initialize settings from manager or use defaults
+        if settings_manager:
+            self._apply_settings(settings_manager)
+            settings_manager.add_change_callback(self._on_settings_changed)
+        else:
+            self.pointer_sensitivity = self.DEFAULT_POINTER_SENSITIVITY
+            self.scroll_sensitivity = self.DEFAULT_SCROLL_SENSITIVITY
+            self.tap_max_duration = self.DEFAULT_TAP_MAX_DURATION
+            self.tap_max_movement = self.DEFAULT_TAP_MAX_MOVEMENT
+            self.tap_drag_enabled = self.DEFAULT_TAP_DRAG_ENABLED
+            self.tap_drag_window = self.DEFAULT_TAP_DRAG_WINDOW
 
         # Touch tracking state
         self.active_touches: dict[object, TouchState] = {}  # sequence -> state
@@ -67,6 +87,21 @@ class TouchpadHandler:
         # Scroll accumulator for sub-pixel precision
         self.scroll_accumulator_x = 0.0
         self.scroll_accumulator_y = 0.0
+
+    def _apply_settings(self, settings_manager: SettingsManager):
+        """Apply settings from the settings manager."""
+        touchpad = settings_manager.touchpad
+        self.pointer_sensitivity = touchpad.pointer_sensitivity
+        self.scroll_sensitivity = touchpad.scroll_sensitivity
+        self.tap_drag_enabled = touchpad.tap_drag_enabled
+        self.tap_drag_window = touchpad.tap_drag_window
+        # These remain at defaults (not exposed in settings UI)
+        self.tap_max_duration = self.DEFAULT_TAP_MAX_DURATION
+        self.tap_max_movement = self.DEFAULT_TAP_MAX_MOVEMENT
+
+    def _on_settings_changed(self, settings_manager: SettingsManager):
+        """Callback when settings are updated."""
+        self._apply_settings(settings_manager)
 
     def setup_gestures(self, widget: TouchpadWidget):
         """
@@ -133,7 +168,7 @@ class TouchpadHandler:
             self.pointer_accumulator_y = 0.0
 
             # Check for tap-drag: single finger touch shortly after a tap
-            if (now - self._last_tap_time) < self.TAP_DRAG_WINDOW:
+            if self.tap_drag_enabled and (now - self._last_tap_time) < self.tap_drag_window:
                 self._tap_drag_active = True
                 self.touchpad.click("left", pressed=True)
 
@@ -173,7 +208,7 @@ class TouchpadHandler:
 
         # Check if this movement exceeds tap threshold
         total_movement = abs(x - touch.start_x) + abs(y - touch.start_y)
-        if total_movement > self.TAP_MAX_MOVEMENT:
+        if total_movement > self.tap_max_movement:
             touch.has_moved = True
             self._any_finger_moved = True
 
@@ -234,8 +269,8 @@ class TouchpadHandler:
 
     def _process_single_finger_motion(self, dx: float, dy: float):
         """Convert finger motion to pointer movement with sub-pixel precision."""
-        self.pointer_accumulator_x += dx * self.POINTER_SENSITIVITY
-        self.pointer_accumulator_y += dy * self.POINTER_SENSITIVITY
+        self.pointer_accumulator_x += dx * self.pointer_sensitivity
+        self.pointer_accumulator_y += dy * self.pointer_sensitivity
 
         pointer_dx = int(self.pointer_accumulator_x)
         pointer_dy = int(self.pointer_accumulator_y)
@@ -248,8 +283,8 @@ class TouchpadHandler:
     def _process_two_finger_motion(self, dx: float, dy: float):
         """Convert two-finger motion to scroll events (natural scrolling)."""
         # Natural scrolling: finger up = content up = positive wheel
-        self.scroll_accumulator_x += dx * self.SCROLL_SENSITIVITY
-        self.scroll_accumulator_y -= dy * self.SCROLL_SENSITIVITY  # Inverted
+        self.scroll_accumulator_x += dx * self.scroll_sensitivity
+        self.scroll_accumulator_y -= dy * self.scroll_sensitivity  # Inverted
 
         scroll_x = int(self.scroll_accumulator_x)
         scroll_y = int(self.scroll_accumulator_y)
@@ -273,7 +308,7 @@ class TouchpadHandler:
         duration = now - self.first_touch_time
 
         # Check if duration is within tap threshold
-        if duration > self.TAP_MAX_DURATION:
+        if duration > self.tap_max_duration:
             return None
 
         # Check if any finger moved too much

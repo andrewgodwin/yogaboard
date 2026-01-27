@@ -101,3 +101,39 @@ window {
 .touchpad-controls {
     margin-top: 10px;
 }
+
+/* Settings dialog styling */
+window label {
+    color: #ffffff;
+}
+
+window checkbutton {
+    color: #ffffff;
+}
+
+window button {
+    background: #2d3748;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+}
+
+window button:hover {
+    background: #3a4555;
+}
+
+window scale trough {
+    background: #2d3748;
+    border-radius: 4px;
+}
+
+window scale highlight {
+    background: #644421;
+    border-radius: 4px;
+}
+
+window scale slider {
+    background: #ffffff;
+    border-radius: 50%;
+}

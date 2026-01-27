@@ -1,9 +1,10 @@
-"""Touch gesture handling for touchpad widget."""
+"""Touch gesture handling for touchpad widget using raw touch events."""
 
 from __future__ import annotations
 
 import gi
 import time
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from yogaboard.input_device.uinput_touchpad import UInputTouchpad
@@ -16,13 +17,26 @@ if TYPE_CHECKING:
     from yogaboard.main import KeyboardApp
 
 
+@dataclass
+class TouchState:
+    """State for tracking a single touch point."""
+
+    sequence: object  # Gdk.EventSequence - opaque identifier
+    start_x: float
+    start_y: float
+    last_x: float
+    last_y: float
+    start_time: float
+    has_moved: bool = False  # True if movement exceeded TAP_MAX_MOVEMENT
+
+
 class TouchpadHandler:
     """
-    Handles touch gestures on the touchpad widget and converts them to
+    Handles raw touch events on the touchpad widget and converts them to
     pointer/scroll/click events.
 
-    Uses GestureDrag for single-finger motion and GestureZoom for two-finger scroll.
-    Mouse buttons are provided via dedicated UI buttons.
+    Uses EventControllerLegacy to receive raw touch events for full control
+    over gesture recognition, enabling tiny movements and multi-finger taps.
     """
 
     # Gesture tuning parameters
@@ -35,45 +49,33 @@ class TouchpadHandler:
         self.touchpad = uinput_touchpad
         self.app: KeyboardApp = app
 
-        # Track gesture states
-        self.two_finger_active = False
-        self.drag_start_x = 0.0
-        self.drag_start_y = 0.0
-        self.drag_last_x = 0.0
-        self.drag_last_y = 0.0
+        # Touch tracking state
+        self.active_touches: dict[object, TouchState] = {}  # sequence -> state
+        self._max_fingers_in_gesture = 0  # For tap type detection
+        self._any_finger_moved = False  # For tap detection
+        self.first_touch_time = 0.0
 
-        # For two-finger scroll tracking
-        self.scroll_last_x = 0.0
-        self.scroll_last_y = 0.0
+        # Pointer accumulator for sub-pixel precision
+        self.pointer_accumulator_x = 0.0
+        self.pointer_accumulator_y = 0.0
+
+        # Scroll accumulator for sub-pixel precision
         self.scroll_accumulator_x = 0.0
         self.scroll_accumulator_y = 0.0
 
-        # Tap tracking
-        self.drag_start_time = 0.0
-
     def setup_gestures(self, widget: TouchpadWidget):
         """
-        Setup touch gesture recognition on the touchpad widget.
+        Setup raw touch event handling on the touchpad widget.
 
         Args:
-            widget: TouchpadWidget to attach gestures to
+            widget: TouchpadWidget to attach event controller to
         """
         touchpad_area = widget.touchpad_area
 
-        # Drag gesture for single-finger motion tracking
-        self.drag_gesture = Gtk.GestureDrag.new()
-        self.drag_gesture.set_touch_only(True)
-        self.drag_gesture.connect("drag-begin", self._on_drag_begin)
-        self.drag_gesture.connect("drag-update", self._on_drag_update)
-        self.drag_gesture.connect("drag-end", self._on_drag_end)
-        touchpad_area.add_controller(self.drag_gesture)
-
-        # Zoom gesture to detect two-finger gestures for scrolling
-        self.zoom_gesture = Gtk.GestureZoom.new()
-        self.zoom_gesture.connect("begin", self._on_zoom_begin)
-        self.zoom_gesture.connect("scale-changed", self._on_zoom_update)
-        self.zoom_gesture.connect("end", self._on_zoom_end)
-        touchpad_area.add_controller(self.zoom_gesture)
+        # Use EventControllerLegacy for raw touch event access
+        self.legacy_controller = Gtk.EventControllerLegacy.new()
+        self.legacy_controller.connect("event", self._on_event)
+        touchpad_area.add_controller(self.legacy_controller)
 
         # Connect mouse buttons with press/release for drag support
         self._setup_mouse_button(widget.left_click_button, "left")
@@ -86,73 +88,148 @@ class TouchpadHandler:
         if widget.close_button:
             widget.close_button.connect("clicked", self._on_close_clicked)
 
-    def _on_drag_begin(self, gesture, start_x, start_y):
-        """Handle start of drag gesture."""
-        self.drag_start_x = start_x
-        self.drag_start_y = start_y
-        self.drag_last_x = start_x
-        self.drag_last_y = start_y
-        self.drag_start_time = time.monotonic()
+    def _on_event(self, controller, _event) -> bool:
+        """Main event dispatcher for raw touch events."""
+        # Get event from controller since callback param may be None in PyGObject
+        event = controller.get_current_event()
+        if event is None:
+            return False
+        event_type = event.get_event_type()
 
-    def _on_drag_update(self, gesture, offset_x, offset_y):
-        """Handle drag motion - pointer movement when single finger."""
-        if self.two_finger_active:
+        if event_type == Gdk.EventType.TOUCH_BEGIN:
+            self._on_touch_begin(event)
+            return True
+        elif event_type == Gdk.EventType.TOUCH_UPDATE:
+            self._on_touch_update(event)
+            return True
+        elif event_type == Gdk.EventType.TOUCH_END:
+            self._on_touch_end(event)
+            return True
+        elif event_type == Gdk.EventType.TOUCH_CANCEL:
+            self._on_touch_cancel(event)
+            return True
+
+        return False  # Event not handled, let it propagate
+
+    def _on_touch_begin(self, event):
+        """Handle finger down event."""
+        sequence = event.get_event_sequence()
+        success, x, y = event.get_position()
+        now = time.monotonic()
+
+        # If this is the first finger, reset gesture state
+        if len(self.active_touches) == 0:
+            self.first_touch_time = now
+            self._max_fingers_in_gesture = 0
+            self._any_finger_moved = False
+            self.scroll_accumulator_x = 0.0
+            self.scroll_accumulator_y = 0.0
+            self.pointer_accumulator_x = 0.0
+            self.pointer_accumulator_y = 0.0
+
+        # Store touch state
+        self.active_touches[sequence] = TouchState(
+            sequence=sequence,
+            start_x=x,
+            start_y=y,
+            last_x=x,
+            last_y=y,
+            start_time=now,
+            has_moved=False,
+        )
+
+        # Track maximum fingers for tap detection
+        current_count = len(self.active_touches)
+        self._max_fingers_in_gesture = max(
+            self._max_fingers_in_gesture, current_count
+        )
+
+    def _on_touch_update(self, event):
+        """Handle finger move event."""
+        sequence = event.get_event_sequence()
+        if sequence not in self.active_touches:
             return
 
-        current_x = self.drag_start_x + offset_x
-        current_y = self.drag_start_y + offset_y
+        touch = self.active_touches[sequence]
+        success, x, y = event.get_position()
 
-        dx = current_x - self.drag_last_x
-        dy = current_y - self.drag_last_y
+        # Calculate delta from last position
+        dx = x - touch.last_x
+        dy = y - touch.last_y
 
-        self.drag_last_x = current_x
-        self.drag_last_y = current_y
+        # Update last position
+        touch.last_x = x
+        touch.last_y = y
 
-        pointer_dx = int(dx * self.POINTER_SENSITIVITY)
-        pointer_dy = int(dy * self.POINTER_SENSITIVITY)
-        self.touchpad.move_pointer(pointer_dx, pointer_dy)
+        # Check if this movement exceeds tap threshold
+        total_movement = abs(x - touch.start_x) + abs(y - touch.start_y)
+        if total_movement > self.TAP_MAX_MOVEMENT:
+            touch.has_moved = True
+            self._any_finger_moved = True
 
-    def _on_drag_end(self, gesture, offset_x, offset_y):
-        """Handle end of drag gesture - detect single-finger taps."""
-        if self.two_finger_active:
+        # Process based on finger count
+        finger_count = len(self.active_touches)
+
+        if finger_count == 1:
+            # Single finger: pointer movement
+            self._process_single_finger_motion(dx, dy)
+        elif finger_count >= 2:
+            # Two+ fingers: scrolling
+            self._process_two_finger_motion(dx, dy)
+
+    def _on_touch_end(self, event):
+        """Handle finger up event."""
+        sequence = event.get_event_sequence()
+        if sequence not in self.active_touches:
             return
 
-        duration = time.monotonic() - self.drag_start_time
-        movement = abs(offset_x) + abs(offset_y)
+        # Remove this touch
+        del self.active_touches[sequence]
 
-        if duration < self.TAP_MAX_DURATION and movement < self.TAP_MAX_MOVEMENT:
-            self.touchpad.tap("left")
+        # If all fingers are now up, check for tap gestures
+        if len(self.active_touches) == 0:
+            tap_result = self._detect_tap_gesture()
+            if tap_result:
+                self.touchpad.tap(tap_result)
 
-    def _on_zoom_begin(self, gesture, sequence):
-        """Handle start of two-finger gesture."""
-        self.two_finger_active = True
+    def _on_touch_cancel(self, event):
+        """Handle cancelled touch - cleanup without triggering gestures."""
+        sequence = event.get_event_sequence()
+        if sequence in self.active_touches:
+            del self.active_touches[sequence]
 
-        success, rect = gesture.get_bounding_box()
-        if success:
-            self.scroll_last_x = rect.x + rect.width / 2
-            self.scroll_last_y = rect.y + rect.height / 2
+        # If all touches cancelled, reset state
+        if len(self.active_touches) == 0:
+            self._reset_gesture_state()
 
+    def _reset_gesture_state(self):
+        """Reset all gesture tracking state."""
+        self.active_touches.clear()
         self.scroll_accumulator_x = 0.0
         self.scroll_accumulator_y = 0.0
+        self.pointer_accumulator_x = 0.0
+        self.pointer_accumulator_y = 0.0
+        self._max_fingers_in_gesture = 0
+        self._any_finger_moved = False
 
-    def _on_zoom_update(self, gesture, scale):
-        """Handle two-finger gesture update - scrolling."""
-        success, rect = gesture.get_bounding_box()
-        if not success:
-            return
+    def _process_single_finger_motion(self, dx: float, dy: float):
+        """Convert finger motion to pointer movement with sub-pixel precision."""
+        self.pointer_accumulator_x += dx * self.POINTER_SENSITIVITY
+        self.pointer_accumulator_y += dy * self.POINTER_SENSITIVITY
 
-        current_x = rect.x + rect.width / 2
-        current_y = rect.y + rect.height / 2
+        pointer_dx = int(self.pointer_accumulator_x)
+        pointer_dy = int(self.pointer_accumulator_y)
 
-        dx = current_x - self.scroll_last_x
-        dy = current_y - self.scroll_last_y
+        if pointer_dx != 0 or pointer_dy != 0:
+            self.touchpad.move_pointer(pointer_dx, pointer_dy)
+            self.pointer_accumulator_x -= pointer_dx
+            self.pointer_accumulator_y -= pointer_dy
 
-        self.scroll_last_x = current_x
-        self.scroll_last_y = current_y
-
-        # Natural scrolling
+    def _process_two_finger_motion(self, dx: float, dy: float):
+        """Convert two-finger motion to scroll events (natural scrolling)."""
+        # Natural scrolling: finger up = content up = positive wheel
         self.scroll_accumulator_x += dx * self.SCROLL_SENSITIVITY
-        self.scroll_accumulator_y -= dy * self.SCROLL_SENSITIVITY
+        self.scroll_accumulator_y -= dy * self.SCROLL_SENSITIVITY  # Inverted
 
         scroll_x = int(self.scroll_accumulator_x)
         scroll_y = int(self.scroll_accumulator_y)
@@ -162,11 +239,36 @@ class TouchpadHandler:
             self.scroll_accumulator_x -= scroll_x
             self.scroll_accumulator_y -= scroll_y
 
-    def _on_zoom_end(self, gesture, sequence):
-        """Handle end of two-finger gesture."""
-        self.two_finger_active = False
-        self.scroll_accumulator_x = 0.0
-        self.scroll_accumulator_y = 0.0
+    def _detect_tap_gesture(self) -> str | None:
+        """
+        Determine if the gesture that just ended was a tap.
+
+        Returns:
+            "left" for single-finger tap
+            "right" for two-finger tap
+            "middle" for three-finger tap
+            None if not a tap
+        """
+        now = time.monotonic()
+        duration = now - self.first_touch_time
+
+        # Check if duration is within tap threshold
+        if duration > self.TAP_MAX_DURATION:
+            return None
+
+        # Check if any finger moved too much
+        if self._any_finger_moved:
+            return None
+
+        # Determine tap type based on max finger count during gesture
+        if self._max_fingers_in_gesture == 1:
+            return "left"
+        elif self._max_fingers_in_gesture == 2:
+            return "right"
+        elif self._max_fingers_in_gesture >= 3:
+            return "middle"
+
+        return None
 
     def _setup_mouse_button(self, button, button_name: str):
         """Setup press/release handling for a mouse button using GestureClick on Box."""
@@ -198,4 +300,4 @@ class TouchpadHandler:
 
     def cleanup(self):
         """Cleanup resources."""
-        self.two_finger_active = False
+        self._reset_gesture_state()

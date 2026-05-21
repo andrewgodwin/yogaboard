@@ -1,16 +1,14 @@
 {
   "app-id": "org.aeracode.yogaboard",
   "runtime": "org.gnome.Platform",
-  "runtime-version": "48",
+  "runtime-version": "50",
   "sdk": "org.gnome.Sdk",
   "command": "yogaboard",
   "build-options": {
     "env": {
       "V": "1"
     },
-    "build-args": [
-      "--unset-env=LD_PRELOAD"
-    ]
+    "build-args": ["--unset-env=LD_PRELOAD"]
   },
   "finish-args": [
     "--share=ipc",
@@ -23,11 +21,7 @@
     {
       "name": "gtk4-layer-shell",
       "buildsystem": "meson",
-      "config-opts": [
-        "-Dexamples=false",
-        "-Ddocs=false",
-        "-Dtests=false"
-      ],
+      "config-opts": ["-Dexamples=false", "-Ddocs=false", "-Dtests=false"],
       "sources": [
         {
           "type": "archive",

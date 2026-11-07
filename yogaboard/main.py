@@ -20,6 +20,7 @@ from yogaboard.input_device.uinput_touchpad import UInputTouchpad
 from yogaboard.input.touch_handler import TouchHandler
 from yogaboard.input.touchpad_handler import TouchpadHandler
 from yogaboard.input.modifier_state import ModifierState
+from yogaboard.input.keyboard_position import KeyboardPositionMonitor
 from yogaboard.settings import SettingsManager
 import os
 
@@ -35,6 +36,7 @@ class KeyboardApp(Gtk.Application):
     def __init__(self):
         super().__init__(application_id="org.aeracode.yogaboard")
         self.current_mode = self.MODE_SLIM
+        self.mode_before_attach = None
         self.keyboard_widget = None
         self.touchpad_widget = None
         self.settings_manager = SettingsManager()
@@ -102,6 +104,12 @@ class KeyboardApp(Gtk.Application):
 
             # Start in slim mode
             self.switch_to_layout(self.MODE_SLIM)
+
+            # Follow the physical keyboard, which may change the mode right away
+            self.keyboard_position_monitor = KeyboardPositionMonitor(
+                self._on_keyboard_position
+            )
+            self.keyboard_position_monitor.start()
 
             self.window.present()
 
@@ -210,6 +218,36 @@ class KeyboardApp(Gtk.Application):
         self.touch_handler.setup_gestures(self.keyboard_widget)
         self.touchpad_handler.setup_gestures(self.touchpad_widget)
 
+    def switch_to_mode(self, mode):
+        """Switch to any mode, if we're not already in it."""
+        if mode == self.current_mode:
+            return
+        if mode == self.MODE_FULL:
+            self.switch_to_full()
+        elif mode == self.MODE_SMALL:
+            self.switch_to_small()
+        else:
+            self.switch_to_layout(mode)
+
+    def _on_keyboard_position(self, position):
+        """Fit the mode around the physical keyboard while it's on the screen."""
+        if position == KeyboardPositionMonitor.POSITION_OFF:
+            if self.mode_before_attach is not None:
+                self.switch_to_mode(self.mode_before_attach)
+                self.mode_before_attach = None
+            return
+
+        # This stays set if the keyboard goes directly between positions
+        if self.mode_before_attach is None:
+            self.mode_before_attach = self.current_mode
+
+        if position == KeyboardPositionMonitor.POSITION_HINGE:
+            # Our full mode covers the screen, which pushes windows out from
+            # underneath the physical keyboard
+            self.switch_to_mode(self.MODE_FULL)
+        elif position == KeyboardPositionMonitor.POSITION_FAR:
+            self.switch_to_mode(self.MODE_KEYBOARD)
+
     def open_settings(self):
         """Open the settings dialog."""
         if self.settings_dialog is None or not self.settings_dialog.is_visible():
@@ -250,6 +288,8 @@ class KeyboardApp(Gtk.Application):
 
     def do_shutdown(self):
         """Cleanup when application is closing."""
+        if hasattr(self, "keyboard_position_monitor"):
+            self.keyboard_position_monitor.cleanup()
         if hasattr(self, "touch_handler"):
             self.touch_handler.cleanup()
         if hasattr(self, "touchpad_handler"):

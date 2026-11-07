@@ -23,6 +23,15 @@ sudo usermod -a -G input $USER
 ```
 Then log out and back in.
 
+## Physical Keyboard
+
+If the [`yoga-keyboard` daemon](https://github.com/andrewgodwin/lenovo-yoga-book-9i) is running, the mode follows the Yoga Book's magnetic keyboard:
+
+* At the far edge of the screen, it switches to the keyboard mode (no touchpad)
+* Against the hinge, it switches to the full mode, which pushes windows out of the way
+
+Taking the keyboard off the screen goes back to the mode from before it was attached.
+
 ## Dev Notes
 
 The keyboard emulates a normal keyboard using uinput, including the held state of all keys, so you can hold down Ctrl and left-click with a mouse to open a new tab, for example.
